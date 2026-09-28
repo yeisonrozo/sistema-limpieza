@@ -1,0 +1,639 @@
+/* =========================================================
+   PAGOS - CONTENEDOR PRINCIPAL
+========================================================= */
+
+.pagos-page {
+  width: 100%;
+  padding: 28px 30px 40px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.pagos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.pagos-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.pagos-header p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* =========================================================
+   BOTÓN PRINCIPAL
+========================================================= */
+
+.btn-primary {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #f3f4f6;
+}
+
+/* =========================================================
+   ESTADÍSTICAS
+========================================================= */
+
+.pagos-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.pago-stat-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 105px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.pago-stat-card span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.pago-stat-card strong {
+  display: block;
+  font-size: 23px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.pago-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.pagos-toolbar {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.pagos-search {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f9fafb;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.pagos-search span {
+  font-size: 17px;
+}
+
+.pagos-search input {
+  width: 100%;
+  height: 42px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #111827;
+  font-size: 14px;
+}
+
+.pagos-search input::placeholder {
+  color: #9ca3af;
+}
+
+/* =========================================================
+   SECCIONES
+========================================================= */
+
+.pagos-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.section-title {
+  padding: 20px 22px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.section-title h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #111827;
+  font-weight: 800;
+}
+
+.section-title p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.pagos-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pagos-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.pagos-table thead {
+  background: #f8fafc;
+}
+
+.pagos-table th {
+  padding: 13px 16px;
+  text-align: left;
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.pagos-table td {
+  padding: 15px 16px;
+  font-size: 13px;
+  color: #374151;
+  border-bottom: 1px solid #f0f2f5;
+  vertical-align: middle;
+}
+
+.pagos-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.pagos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pagos-table td strong {
+  color: #111827;
+}
+
+.cliente-table {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cliente-table strong {
+  font-size: 13px;
+}
+
+.cliente-table span {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* =========================================================
+   COLORES
+========================================================= */
+
+.text-success {
+  color: #059669 !important;
+  font-weight: 700;
+}
+
+.text-warning {
+  color: #d97706 !important;
+  font-weight: 700;
+}
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.estado-paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.estado-partial {
+  background: #fef3c7;
+  color: #a16207;
+}
+
+.estado-pending {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* =========================================================
+   BOTÓN PAGAR
+========================================================= */
+
+.btn-table-payment {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 7px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-table-payment:hover {
+  background: #1d4ed8;
+}
+
+.paid-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #059669;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   ACCIONES DE PAGOS
+========================================================= */
+
+.payment-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn.receipt:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.action-btn.edit:hover {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.action-btn.delete:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* =========================================================
+   LOADING / EMPTY
+========================================================= */
+
+.pagos-loading,
+.pagos-empty {
+  padding: 45px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 650px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+
+.payment-modal {
+  max-width: 680px;
+}
+
+.modal-header {
+  padding: 20px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #111827;
+}
+
+.modal-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.modal-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 7px;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  background: #e5e7eb;
+}
+
+/* =========================================================
+   RESUMEN DE FACTURA EN MODAL
+========================================================= */
+
+.payment-invoice-summary {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 1px;
+  background: #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.payment-invoice-summary > div {
+  background: #f8fafc;
+  padding: 15px;
+}
+
+.payment-invoice-summary span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 10px;
+  color: #6b7280;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.payment-invoice-summary strong {
+  display: block;
+  font-size: 14px;
+  color: #111827;
+}
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
+
+.form-grid {
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  height: 42px;
+  padding: 0 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  outline: none;
+  background: white;
+  color: #111827;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* =========================================================
+   SALDO DESPUÉS DEL PAGO
+========================================================= */
+
+.payment-modal-info {
+  margin: 0 22px 20px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.payment-modal-info span {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.payment-modal-info strong {
+  font-size: 17px;
+  color: #075b9f;
+}
+
+/* =========================================================
+   ACCIONES DEL MODAL
+========================================================= */
+
+.modal-actions {
+  padding: 18px 22px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media screen and (max-width: 1100px) {
+  .pagos-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .pagos-page {
+    padding: 20px 16px 30px;
+  }
+
+  .pagos-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pagos-header .btn-primary {
+    width: 100%;
+  }
+
+  .payment-invoice-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .pagos-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .pagos-header h2 {
+    font-size: 24px;
+  }
+
+  .pago-stat-card {
+    padding: 16px;
+  }
+
+  .pago-stat-card strong {
+    font-size: 20px;
+  }
+
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .modal-content {
+    margin-top: 20px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}

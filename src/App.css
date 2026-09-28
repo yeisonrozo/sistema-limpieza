@@ -1,0 +1,583 @@
+/* ================================
+   LAYOUT
+================================ */
+
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  background: #f5f7fb;
+}
+
+.sidebar-container {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ================================
+   SIDEBAR
+================================ */
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #111827;
+  color: white;
+
+  padding: 24px 16px;
+
+  z-index: 1000;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 5px 8px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.logo-box {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #2563eb;
+  border-radius: 11px;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sidebar-logo h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.sidebar-logo span {
+  display: block;
+  margin-top: 2px;
+
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.sidebar-menu {
+  margin-top: 28px;
+  flex: 1;
+}
+
+.menu-title {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+
+  padding: 0 12px;
+  margin-bottom: 10px;
+}
+
+.menu-item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  border: none;
+  background: transparent;
+
+  color: #9ca3af;
+
+  padding: 12px;
+  margin-bottom: 4px;
+
+  border-radius: 9px;
+
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+
+  transition: 0.2s;
+}
+
+.menu-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: white;
+}
+
+.menu-item.active {
+  background: #2563eb;
+  color: white;
+}
+
+.menu-icon {
+  width: 22px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding-top: 15px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ================================
+   HEADER
+================================ */
+
+.header {
+  height: 72px;
+
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 30px;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-title h1 {
+  font-size: 20px;
+  color: #111827;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #dbeafe;
+  color: #2563eb;
+
+  border-radius: 50%;
+
+  font-weight: 700;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-details strong {
+  font-size: 13px;
+  color: #111827;
+}
+
+.user-details span {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.logout-button {
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid #e5e7eb;
+  background: white;
+
+  border-radius: 8px;
+
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.logout-button:hover {
+  background: #f3f4f6;
+}
+
+/* ================================
+   MOBILE MENU
+================================ */
+
+.mobile-menu-button {
+  display: none;
+
+  border: none;
+  background: transparent;
+
+  font-size: 23px;
+  color: #111827;
+}
+
+/* ================================
+   DASHBOARD
+================================ */
+
+.dashboard-content {
+  padding: 30px;
+  max-width: 1600px;
+  margin: auto;
+}
+
+.welcome-section {
+  margin-bottom: 28px;
+}
+
+.welcome-section h2 {
+  font-size: 25px;
+  color: #111827;
+  margin-bottom: 5px;
+}
+
+.welcome-section p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ================================
+   STAT CARDS
+================================ */
+
+.stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 13px;
+
+  padding: 20px;
+
+  transition: 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.05);
+}
+
+.stat-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stat-card-title {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.stat-card h3 {
+  font-size: 25px;
+  color: #111827;
+}
+
+.stat-card-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eff6ff;
+
+  border-radius: 10px;
+
+  font-size: 19px;
+}
+
+.stat-card-description {
+  margin-top: 14px;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+/* ================================
+   PANELS
+================================ */
+
+.dashboard-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(300px, 1fr);
+
+  gap: 20px;
+}
+
+.dashboard-panel {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 13px;
+
+  padding: 22px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+}
+
+.panel-header h3 {
+  font-size: 16px;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.panel-header p {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.view-all-button {
+  border: none;
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.empty-state {
+  min-height: 230px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.empty-icon {
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f3f4f6;
+
+  border-radius: 50%;
+
+  font-size: 23px;
+
+  margin-bottom: 12px;
+}
+
+.empty-state h4 {
+  color: #374151;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.empty-state p {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* ================================
+   QUICK ACTIONS
+================================ */
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quick-actions button {
+  min-height: 90px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  background: #f9fafb;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  color: #374151;
+
+  font-size: 12px;
+}
+
+.quick-actions button span {
+  font-size: 22px;
+}
+
+.quick-actions button:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1100px) {
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .sidebar-container {
+    position: fixed;
+    left: -250px;
+    top: 0;
+
+    width: 250px;
+    height: 100vh;
+
+    z-index: 2000;
+
+    transition: left 0.25s ease;
+  }
+
+  .sidebar-container.open {
+    left: 0;
+  }
+
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .header {
+    padding: 0 15px;
+  }
+
+  .header-title {
+    margin-right: auto;
+    margin-left: 12px;
+  }
+
+  .header-title h1 {
+    font-size: 17px;
+  }
+
+  .user-details {
+    display: none;
+  }
+
+  .dashboard-content {
+    padding: 20px 15px;
+  }
+
+  .welcome-section h2 {
+    font-size: 21px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-card h3 {
+    font-size: 21px;
+  }
+
+  .dashboard-grid {
+    gap: 15px;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.45);
+
+    z-index: 1500;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-panel {
+    padding: 17px;
+  }
+  body {
+  margin: 0;
+}
+
+}

@@ -1,0 +1,589 @@
+/* =========================================================
+   VISTA DE FACTURA
+========================================================= */
+
+.invoice-view-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: #e5e7eb;
+  overflow-y: auto;
+  padding: 30px 20px 50px;
+}
+
+.invoice-view-toolbar {
+  width: 210mm;
+  max-width: 100%;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.invoice-back-button,
+.invoice-print-button {
+  border: none;
+  padding: 11px 17px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.invoice-back-button {
+  background: white;
+  color: #374151;
+}
+
+.invoice-print-button {
+  background: #2563eb;
+  color: white;
+}
+
+.invoice-print-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================================
+   HOJA
+========================================================= */
+
+.invoice-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: white;
+  padding: 20mm 16mm 15mm;
+  box-sizing: border-box;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.invoice-header {
+  height: 42mm;
+  background: #dce8f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15mm;
+  box-sizing: border-box;
+}
+
+.invoice-logo-area {
+  width: 50%;
+  display: flex;
+  align-items: center;
+}
+
+.invoice-logo-area img {
+  max-width: 75mm;
+  max-height: 32mm;
+  object-fit: contain;
+}
+
+.invoice-title {
+  width: 50%;
+  text-align: right;
+  font-size: 31px;
+  font-weight: 900;
+  color: #075b9f;
+  letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   NUMERO Y FECHA
+========================================================= */
+
+.invoice-number-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 9mm;
+  margin-bottom: 9mm;
+}
+
+.invoice-number-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.invoice-info-row {
+  display: grid;
+  grid-template-columns: 38mm 40mm;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.invoice-info-row strong {
+  font-weight: 800;
+}
+
+.invoice-blue-decoration {
+  width: 55mm;
+  margin-top: 3mm;
+  display: flex;
+  height: 3px;
+}
+
+.invoice-blue-decoration span:first-child {
+  width: 75%;
+  background: #9cc4df;
+}
+
+.invoice-blue-decoration span:last-child {
+  width: 25%;
+  background: #075b9f;
+}
+
+
+/* =========================================================
+   CLIENTES
+========================================================= */
+
+.invoice-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20mm;
+  margin-bottom: 12mm;
+}
+
+.party-column {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.party-column h3 {
+  margin: 0 0 7mm;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.party-column strong {
+  display: block;
+  margin-bottom: 7mm;
+  font-size: 14px;
+}
+
+.party-column p {
+  margin: 0;
+}
+
+
+/* =========================================================
+   TABLA DE SERVICIOS
+========================================================= */
+
+.invoice-items {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
+}
+
+.invoice-items th {
+  background: #dce5f4;
+  color: #111827;
+  padding: 7px 5px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.invoice-items th:first-child {
+  width: 39%;
+  text-align: left;
+}
+
+.invoice-items th:nth-child(2) {
+  width: 11%;
+}
+
+.invoice-items th:nth-child(3) {
+  width: 15%;
+}
+
+.invoice-items th:nth-child(4) {
+  width: 17%;
+}
+
+.invoice-items th:nth-child(5) {
+  width: 18%;
+}
+
+.invoice-items td {
+  padding: 6px 5px;
+  border-bottom: 1px solid #eeeeee;
+  vertical-align: middle;
+}
+
+.invoice-items td:first-child {
+  text-align: left;
+}
+
+.invoice-items td:not(:first-child) {
+  text-align: right;
+}
+
+.invoice-empty-row {
+  text-align: center !important;
+  color: #6b7280;
+  padding: 15px !important;
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.invoice-summary {
+  width: 65mm;
+  margin-left: auto;
+  margin-top: 8mm;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 5px;
+  font-size: 11px;
+}
+
+.summary-row strong {
+  font-weight: 700;
+}
+
+.invoice-total-area {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 3mm;
+}
+
+.invoice-total-box {
+  width: 65mm;
+  background: #dce5f4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 7px;
+  box-sizing: border-box;
+}
+
+.invoice-total-box span {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.invoice-total-box strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   INFORMACION DE PAGO
+========================================================= */
+
+.payment-info {
+  margin-top: 10mm;
+  margin-left: 14mm;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.payment-info h3 {
+  margin: 0 0 4mm;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.payment-info p {
+  margin: 0;
+}
+
+
+/* =========================================================
+   DECORACION
+========================================================= */
+
+.invoice-bottom-decoration {
+  margin-top: 12mm;
+}
+
+.decoration-line {
+  display: flex;
+  height: 3px;
+  margin-bottom: 9mm;
+}
+
+.line-one {
+  width: 55mm;
+}
+
+.line-one span:first-child {
+  width: 55%;
+  background: #075b9f;
+}
+
+.line-one span:last-child {
+  width: 45%;
+  background: #9cc4df;
+}
+
+.line-two {
+  width: 40mm;
+}
+
+.line-two span:first-child {
+  width: 45%;
+  background: #075b9f;
+}
+
+.line-two span:last-child {
+  width: 55%;
+  background: #9cc4df;
+}
+
+
+/* =========================================================
+   PIE
+========================================================= */
+
+.invoice-footer {
+  margin-top: 15mm;
+  padding-top: 4mm;
+  border-top: 1px solid #dce5f4;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #9ca3af;
+}
+
+
+/* =========================================================
+   IMPRESION / PDF
+========================================================= */
+
+@media print {
+
+  @page {
+    size: Letter;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /*
+   * Ocultamos absolutamente todo
+   * de la aplicación.
+   */
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  /*
+   * Volvemos visible únicamente
+   * la factura.
+   */
+
+  .invoice-view-overlay,
+  .invoice-view-overlay * {
+    visibility: visible !important;
+  }
+
+  /*
+   * La capa de factura ocupa
+   * absolutamente toda la página.
+   */
+
+  .invoice-view-overlay {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    background: white !important;
+
+    z-index: 999999 !important;
+  }
+
+  /*
+   * Ocultar botones.
+   */
+
+  .invoice-view-toolbar {
+    display: none !important;
+  }
+
+  /*
+   * Hoja tamaño Letter.
+   *
+   * 216mm x 279mm
+   */
+
+  .invoice-page {
+    width: 216mm !important;
+    min-width: 216mm !important;
+
+    height: 279mm !important;
+    min-height: 279mm !important;
+
+    margin: 0 auto !important;
+
+    padding: 15mm 14mm 10mm !important;
+
+    box-sizing: border-box !important;
+
+    background: white !important;
+
+    box-shadow: none !important;
+
+    overflow: hidden !important;
+
+    position: relative !important;
+  }
+
+  /*
+   * Evita que la tabla se divida.
+   */
+
+  .invoice-items {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /*
+   * Evitar cortes de bloques.
+   */
+
+  .invoice-header,
+  .invoice-number-section,
+  .invoice-parties,
+  .invoice-summary,
+  .invoice-total-area,
+  .payment-info,
+  .invoice-bottom-decoration,
+  .invoice-footer {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /*
+   * Mantener los colores
+   * al generar PDF.
+   */
+
+  .invoice-page,
+  .invoice-header,
+  .invoice-items,
+  .invoice-items th,
+  .invoice-total-box {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /*
+   * Evita márgenes adicionales.
+   */
+
+  .invoice-page * {
+    box-sizing: border-box;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media screen and (max-width: 800px) {
+
+  .invoice-view-overlay {
+    padding: 15px;
+  }
+
+  .invoice-page {
+    width: 100%;
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .invoice-header {
+    height: auto;
+    min-height: 130px;
+    padding: 20px;
+  }
+
+  .invoice-title {
+    font-size: 25px;
+  }
+
+  .invoice-parties {
+    gap: 20px;
+  }
+}
+
+
+@media screen and (max-width: 600px) {
+
+  .invoice-view-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invoice-back-button,
+  .invoice-print-button {
+    width: 100%;
+  }
+
+  .invoice-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .invoice-logo-area,
+  .invoice-title {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .invoice-parties {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-items {
+    font-size: 10px;
+  }
+
+  .invoice-items th {
+    font-size: 9px;
+  }
+}

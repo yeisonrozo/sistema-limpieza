@@ -1,0 +1,766 @@
+/* =========================================
+   PAGINA FACTURAS
+========================================= */
+
+.page-content {
+  padding: 30px;
+  max-width: 1600px;
+  margin: auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.page-header h2 {
+  font-size: 25px;
+  color: #111827;
+}
+
+.page-header p {
+  margin-top: 5px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.primary-button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 11px 17px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+.secondary-button {
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  padding: 11px 17px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background: #f9fafb;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.content-panel {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 350px;
+  padding: 11px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  font-size: 13px;
+}
+
+.search-input:focus {
+  border-color: #2563eb;
+}
+
+.results-count {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 13px 18px;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.data-table td {
+  padding: 15px 18px;
+  border-top: 1px solid #f0f0f0;
+  color: #4b5563;
+  font-size: 13px;
+}
+
+.data-table td strong {
+  color: #111827;
+}
+
+.invoice-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.status-pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status-paid {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.view-invoice-button {
+  border: none;
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.view-invoice-button:hover {
+  background: #dbeafe;
+}
+
+.loading-state {
+  padding: 60px;
+  text-align: center;
+  color: #6b7280;
+}
+
+
+/* =========================================
+   MODAL NUEVA FACTURA
+========================================= */
+
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+
+  background: rgba(15, 23, 42, 0.58);
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 25px;
+
+  z-index: 9999 !important;
+
+  overflow-y: auto;
+}
+
+
+/* CONTENEDOR */
+
+.invoice-modal {
+  width: 100% !important;
+  max-width: 950px !important;
+
+  max-height: 92vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.25);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   CABECERA DEL MODAL
+========================================= */
+
+.invoice-modal .modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 25px;
+}
+
+.invoice-modal .modal-header h3 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 21px;
+
+  font-weight: 700;
+}
+
+.invoice-modal .modal-header p {
+  margin-top: 5px;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+.invoice-modal .modal-close {
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  border: none;
+
+  background: #f3f4f6;
+
+  color: #111827;
+
+  border-radius: 9px;
+
+  font-size: 24px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.invoice-modal .modal-close:hover {
+  background: #e5e7eb;
+}
+
+
+/* =========================================
+   FORMULARIOS
+========================================= */
+
+.invoice-modal form {
+  width: 100%;
+}
+
+.invoice-form-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px;
+
+  margin-bottom: 22px;
+}
+
+.invoice-modal .form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.invoice-modal .form-group label {
+  display: block;
+
+  color: #374151;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  margin: 0;
+}
+
+.invoice-modal .form-group input,
+.invoice-modal .form-group select,
+.invoice-modal .form-group textarea {
+  width: 100%;
+
+  min-height: 42px;
+
+  padding: 10px 13px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  color: #111827;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+}
+
+.invoice-modal .form-group select {
+  cursor: pointer;
+}
+
+.invoice-modal .form-group textarea {
+  resize: vertical;
+
+  min-height: 105px;
+}
+
+.invoice-modal .form-group input:focus,
+.invoice-modal .form-group select:focus,
+.invoice-modal .form-group textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================================
+   SECCION SERVICIOS
+========================================= */
+
+.invoice-details-section {
+  margin-top: 20px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 11px;
+
+  padding: 20px;
+
+  background: #ffffff;
+}
+
+.invoice-section-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 18px;
+}
+
+.invoice-section-header h4 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 15px;
+}
+
+.invoice-section-header p {
+  margin-top: 4px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+.add-detail-button {
+  border: 1px solid #2563eb;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  padding: 9px 14px;
+
+  border-radius: 8px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.add-detail-button:hover {
+  background: #dbeafe;
+}
+
+
+/* =========================================
+   SIN SERVICIOS
+========================================= */
+
+.details-empty {
+  padding: 35px;
+
+  text-align: center;
+
+  background: #f9fafb;
+
+  border-radius: 9px;
+
+  color: #6b7280;
+}
+
+.details-empty span {
+  display: block;
+
+  font-size: 28px;
+
+  margin-bottom: 8px;
+}
+
+.details-empty p {
+  margin: 0;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   DETALLES DE SERVICIOS
+========================================= */
+
+.invoice-details {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.invoice-detail-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(220px, 2fr)
+    100px
+    120px
+    120px
+    35px;
+
+  gap: 12px;
+
+  align-items: end;
+
+  padding: 15px;
+
+  background: #f9fafb;
+
+  border-radius: 9px;
+
+  border: 1px solid #f0f0f0;
+}
+
+.service-field,
+.quantity-field {
+  min-width: 0;
+}
+
+.detail-price,
+.detail-total {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  padding-bottom: 10px;
+}
+
+.detail-price span,
+.detail-total span {
+  color: #6b7280;
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  font-weight: 600;
+}
+
+.detail-price strong,
+.detail-total strong {
+  color: #111827;
+
+  font-size: 13px;
+}
+
+.remove-detail-button {
+  width: 32px;
+
+  height: 32px;
+
+  border: none;
+
+  background: #fef2f2;
+
+  color: #dc2626;
+
+  border-radius: 7px;
+
+  font-size: 20px;
+
+  cursor: pointer;
+}
+
+.remove-detail-button:hover {
+  background: #fee2e2;
+}
+
+
+/* =========================================
+   PARTE INFERIOR
+========================================= */
+
+.invoice-bottom {
+  display: grid;
+
+  grid-template-columns: 1fr 320px;
+
+  gap: 30px;
+
+  margin-top: 25px;
+}
+
+.observations-field textarea {
+  min-height: 110px;
+}
+
+
+/* =========================================
+   RESUMEN
+========================================= */
+
+.invoice-modal .invoice-summary {
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 18px;
+
+  height: fit-content;
+
+  background: #ffffff;
+}
+
+.invoice-modal .invoice-summary > div {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 10px 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+.invoice-modal .invoice-summary strong {
+  color: #111827;
+
+  font-weight: 700;
+}
+
+.discount-row input {
+  width: 100px !important;
+
+  min-height: 36px !important;
+
+  text-align: right;
+}
+
+.invoice-grand-total {
+  border-top: 1px solid #e5e7eb;
+
+  margin-top: 8px;
+
+  padding-top: 15px !important;
+}
+
+.invoice-grand-total span {
+  color: #111827;
+
+  font-weight: 700;
+}
+
+.invoice-grand-total strong {
+  font-size: 20px;
+
+  color: #2563eb;
+}
+
+
+/* =========================================
+   BOTONES DEL MODAL
+========================================= */
+
+.invoice-modal .modal-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 25px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+
+/* =========================================
+   RESPONSIVE TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+  .invoice-modal {
+    max-width: 95vw !important;
+
+    padding: 22px;
+  }
+
+  .invoice-detail-row {
+    grid-template-columns:
+      minmax(200px, 1fr)
+      100px
+      120px
+      120px
+      35px;
+  }
+
+  .invoice-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================
+   RESPONSIVE MOVIL
+========================================= */
+
+@media (max-width: 700px) {
+
+  .page-content {
+    padding: 20px 15px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .page-header .primary-button {
+    width: 100%;
+  }
+
+  .table-toolbar {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .search-input {
+    max-width: none;
+  }
+
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .invoice-modal {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    max-height: 95vh;
+
+    padding: 20px;
+
+    border-radius: 12px;
+  }
+
+  .invoice-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-section-header {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .add-detail-button {
+    width: 100%;
+  }
+
+  .invoice-detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-price,
+  .detail-total {
+    padding-bottom: 0;
+  }
+
+  .remove-detail-button {
+    width: 100%;
+  }
+
+  .invoice-modal .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .invoice-modal .modal-actions button {
+    width: 100%;
+  }
+}
