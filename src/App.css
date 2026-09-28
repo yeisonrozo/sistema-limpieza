@@ -1,9 +1,37 @@
 /* ================================
+   RESET / BASE
+================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: #f5f7fb;
+}
+
+/* ================================
    LAYOUT
 ================================ */
 
 .app-layout {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   background: #f5f7fb;
 }
@@ -16,6 +44,7 @@
 .main-content {
   flex: 1;
   min-width: 0;
+  width: calc(100% - 250px);
 }
 
 /* ================================
@@ -25,6 +54,7 @@
 .sidebar {
   width: 250px;
   height: 100vh;
+
   position: fixed;
   left: 0;
   top: 0;
@@ -37,7 +67,10 @@
 
   padding: 24px 16px;
 
-  z-index: 1000;
+  z-index: 2000;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebar-logo {
@@ -46,7 +79,8 @@
   gap: 12px;
 
   padding: 5px 8px 28px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .logo-box {
@@ -58,10 +92,13 @@
   justify-content: center;
 
   background: #2563eb;
+
   border-radius: 11px;
 
   font-size: 15px;
   font-weight: 800;
+
+  flex-shrink: 0;
 }
 
 .sidebar-logo h2 {
@@ -71,9 +108,11 @@
 
 .sidebar-logo span {
   display: block;
+
   margin-top: 2px;
 
   color: #9ca3af;
+
   font-size: 12px;
 }
 
@@ -84,12 +123,15 @@
 
 .menu-title {
   color: #6b7280;
+
   font-size: 10px;
   font-weight: 700;
+
   letter-spacing: 1px;
 
   padding: 0 12px;
-  margin-bottom: 10px;
+
+  margin: 0 0 10px;
 }
 
 .menu-item {
@@ -97,27 +139,35 @@
 
   display: flex;
   align-items: center;
+
   gap: 12px;
 
   border: none;
+
   background: transparent;
 
   color: #9ca3af;
 
   padding: 12px;
+
   margin-bottom: 4px;
 
   border-radius: 9px;
 
   text-align: left;
+
   font-size: 14px;
   font-weight: 500;
 
-  transition: 0.2s;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .menu-item:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: white;
 }
 
@@ -128,12 +178,16 @@
 
 .menu-icon {
   width: 22px;
+
+  min-width: 22px;
+
   text-align: center;
 }
 
 .sidebar-footer {
   padding-top: 15px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ================================
@@ -143,7 +197,10 @@
 .header {
   height: 72px;
 
+  width: 100%;
+
   background: white;
+
   border-bottom: 1px solid #e5e7eb;
 
   display: flex;
@@ -153,24 +210,37 @@
   padding: 0 30px;
 
   position: sticky;
+
   top: 0;
+
   z-index: 100;
+}
+
+.header-title {
+  min-width: 0;
 }
 
 .header-title h1 {
   font-size: 20px;
+
   color: #111827;
+
+  margin: 0;
+
+  white-space: nowrap;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
+
   gap: 15px;
 }
 
 .user-info {
   display: flex;
   align-items: center;
+
   gap: 10px;
 }
 
@@ -183,11 +253,14 @@
   justify-content: center;
 
   background: #dbeafe;
+
   color: #2563eb;
 
   border-radius: 50%;
 
   font-weight: 700;
+
+  flex-shrink: 0;
 }
 
 .user-details {
@@ -209,13 +282,23 @@
   width: 38px;
   height: 38px;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: 1px solid #e5e7eb;
+
   background: white;
 
   border-radius: 8px;
 
   color: #6b7280;
+
   font-size: 18px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
 }
 
 .logout-button:hover {
@@ -223,17 +306,41 @@
 }
 
 /* ================================
-   MOBILE MENU
+   MOBILE MENU BUTTON
 ================================ */
 
 .mobile-menu-button {
   display: none;
 
+  width: 40px;
+  height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
   border: none;
+
   background: transparent;
 
-  font-size: 23px;
   color: #111827;
+
+  font-size: 23px;
+
+  cursor: pointer;
+
+  border-radius: 8px;
+}
+
+.mobile-menu-button:hover {
+  background: #f3f4f6;
+}
+
+/* ================================
+   SIDEBAR OVERLAY
+================================ */
+
+.sidebar-overlay {
+  display: none;
 }
 
 /* ================================
@@ -241,9 +348,13 @@
 ================================ */
 
 .dashboard-content {
+  width: 100%;
+
   padding: 30px;
+
   max-width: 1600px;
-  margin: auto;
+
+  margin: 0 auto;
 }
 
 .welcome-section {
@@ -252,13 +363,18 @@
 
 .welcome-section h2 {
   font-size: 25px;
+
   color: #111827;
-  margin-bottom: 5px;
+
+  margin: 0 0 5px;
 }
 
 .welcome-section p {
   color: #6b7280;
+
   font-size: 14px;
+
+  margin: 0;
 }
 
 /* ================================
@@ -285,31 +401,44 @@
 
   padding: 20px;
 
-  transition: 0.2s;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
 
   box-shadow:
-    0 8px 25px rgba(0,0,0,0.05);
+    0 8px 25px rgba(0, 0, 0, 0.05);
 }
 
 .stat-card-top {
   display: flex;
+
   justify-content: space-between;
+
   align-items: flex-start;
+
+  gap: 10px;
 }
 
 .stat-card-title {
   color: #6b7280;
+
   font-size: 13px;
-  margin-bottom: 8px;
+
+  margin: 0 0 8px;
 }
 
 .stat-card h3 {
   font-size: 25px;
+
   color: #111827;
+
+  margin: 0;
+
+  word-break: break-word;
 }
 
 .stat-card-icon {
@@ -325,10 +454,12 @@
   border-radius: 10px;
 
   font-size: 19px;
+
+  flex-shrink: 0;
 }
 
 .stat-card-description {
-  margin-top: 14px;
+  margin: 14px 0 0;
 
   color: #9ca3af;
 
@@ -357,44 +488,63 @@
   border-radius: 13px;
 
   padding: 22px;
+
+  min-width: 0;
 }
 
 .panel-header {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
+  gap: 15px;
 
   margin-bottom: 20px;
 }
 
 .panel-header h3 {
   font-size: 16px;
+
   color: #111827;
-  margin-bottom: 4px;
+
+  margin: 0 0 4px;
 }
 
 .panel-header p {
   color: #9ca3af;
+
   font-size: 12px;
+
+  margin: 0;
 }
 
 .view-all-button {
   border: none;
+
   background: transparent;
 
   color: #2563eb;
 
   font-size: 12px;
+
   font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
 }
 
 .empty-state {
   min-height: 230px;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
   text-align: center;
@@ -419,13 +569,18 @@
 
 .empty-state h4 {
   color: #374151;
+
   font-size: 14px;
-  margin-bottom: 5px;
+
+  margin: 0 0 5px;
 }
 
 .empty-state p {
   color: #9ca3af;
+
   font-size: 12px;
+
+  margin: 0;
 }
 
 /* ================================
@@ -434,7 +589,9 @@
 
 .quick-actions {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: 10px;
 }
 
@@ -442,8 +599,11 @@
   min-height: 90px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 7px;
@@ -457,6 +617,13 @@
   color: #374151;
 
   font-size: 12px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .quick-actions button span {
@@ -465,16 +632,17 @@
 
 .quick-actions button:hover {
   background: #eff6ff;
+
   border-color: #bfdbfe;
+
   color: #2563eb;
 }
 
 /* ================================
-   RESPONSIVE
+   TABLET
 ================================ */
 
 @media (max-width: 1100px) {
-
   .stats-grid {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
@@ -483,101 +651,404 @@
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-
 }
+
+/* ================================
+   MOBILE
+================================ */
 
 @media (max-width: 768px) {
 
+  /* ---------- LAYOUT ---------- */
+
+  .app-layout {
+    width: 100%;
+    min-height: 100vh;
+
+    display: block;
+
+    overflow-x: hidden;
+  }
+
   .sidebar-container {
-    position: fixed;
-    left: -250px;
-    top: 0;
+    position: fixed !important;
 
-    width: 250px;
-    height: 100vh;
+    top: 0 !important;
+    left: 0 !important;
 
-    z-index: 2000;
+    width: 280px !important;
 
-    transition: left 0.25s ease;
+    max-width: 82vw !important;
+
+    height: 100vh !important;
+
+    z-index: 2000 !important;
+
+    transform: translateX(-100%);
+
+    transition: transform 0.25s ease;
+
+    flex-shrink: 0;
+
+    pointer-events: none;
   }
 
   .sidebar-container.open {
-    left: 0;
+    transform: translateX(0);
+
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    height: 100vh !important;
+
+    padding: 24px 16px;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+  }
+
+  .main-content {
+    width: 100% !important;
+
+    min-width: 0;
+
+    margin: 0;
+
+    padding: 0;
+  }
+
+  /* ---------- HEADER ---------- */
+
+  .header {
+    width: 100%;
+
+    height: 64px;
+
+    padding: 0 15px;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
   }
 
   .mobile-menu-button {
-    display: block;
-  }
+    display: flex !important;
 
-  .header {
-    padding: 0 15px;
+    flex-shrink: 0;
   }
 
   .header-title {
     margin-right: auto;
-    margin-left: 12px;
+
+    margin-left: 10px;
+
+    min-width: 0;
   }
 
   .header-title h1 {
     font-size: 17px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+  .header-actions {
+    gap: 8px;
   }
 
   .user-details {
     display: none;
   }
 
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logout-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* ---------- OVERLAY ---------- */
+
+  .sidebar-overlay {
+    display: block;
+
+    position: fixed !important;
+
+    inset: 0 !important;
+
+    width: 100vw !important;
+
+    height: 100vh !important;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    z-index: 1500 !important;
+
+    cursor: pointer;
+  }
+
+  /* ---------- DASHBOARD ---------- */
+
   .dashboard-content {
+    width: 100%;
+
+    max-width: none;
+
     padding: 20px 15px;
+  }
+
+  .welcome-section {
+    margin-bottom: 20px;
   }
 
   .welcome-section h2 {
     font-size: 21px;
   }
 
+  .welcome-section p {
+    font-size: 13px;
+
+    line-height: 1.5;
+  }
+
+  /* ---------- CARDS ---------- */
+
   .stats-grid {
     grid-template-columns: 1fr 1fr;
+
     gap: 12px;
+
+    margin-bottom: 18px;
   }
 
   .stat-card {
     padding: 15px;
+
+    border-radius: 12px;
+  }
+
+  .stat-card-title {
+    font-size: 12px;
+  }
+
+  .stat-card h3 {
+    font-size: 20px;
+  }
+
+  .stat-card-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 17px;
+  }
+
+  .stat-card-description {
+    font-size: 10px;
+
+    line-height: 1.4;
+  }
+
+  /* ---------- PANELS ---------- */
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+
+    gap: 15px;
+  }
+
+  .dashboard-panel {
+    width: 100%;
+
+    padding: 17px;
+
+    border-radius: 12px;
+  }
+
+  .panel-header {
+    margin-bottom: 15px;
+  }
+
+  .panel-header h3 {
+    font-size: 15px;
+  }
+
+  .panel-header p {
+    font-size: 11px;
+  }
+
+  /* ---------- QUICK ACTIONS ---------- */
+
+  .quick-actions {
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+  }
+
+  .quick-actions button {
+    min-height: 82px;
+
+    font-size: 11px;
+  }
+
+  .quick-actions button span {
+    font-size: 20px;
+  }
+}
+
+/* ================================
+   SMALL MOBILE
+================================ */
+
+@media (max-width: 480px) {
+
+  .sidebar-container {
+    width: 280px !important;
+
+    max-width: 82vw !important;
+  }
+
+  .sidebar {
+    padding: 20px 14px;
+  }
+
+  .sidebar-logo {
+    padding-bottom: 22px;
+  }
+
+  .sidebar-menu {
+    margin-top: 22px;
+  }
+
+  .menu-item {
+    padding: 12px 10px;
+
+    font-size: 14px;
+  }
+
+  .header {
+    height: 62px;
+
+    padding: 0 10px;
+  }
+
+  .mobile-menu-button {
+    width: 38px;
+    height: 38px;
+
+    font-size: 22px;
+  }
+
+  .header-title {
+    margin-left: 7px;
+  }
+
+  .header-title h1 {
+    font-size: 16px;
+  }
+
+  .header-actions {
+    gap: 5px;
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logout-button {
+    width: 34px;
+    height: 34px;
+
+    font-size: 16px;
+  }
+
+  .dashboard-content {
+    padding: 18px 12px;
+  }
+
+  .welcome-section h2 {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px;
   }
 
   .stat-card h3 {
     font-size: 21px;
   }
 
-  .dashboard-grid {
-    gap: 15px;
-  }
-
-  .sidebar-overlay {
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0,0,0,0.45);
-
-    z-index: 1500;
-  }
-
-}
-
-@media (max-width: 480px) {
-
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .dashboard-panel {
+    padding: 15px;
   }
 
   .quick-actions {
     grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
   }
 
-  .dashboard-panel {
-    padding: 17px;
+  .quick-actions button {
+    min-height: 78px;
+
+    font-size: 10px;
   }
+
   body {
-  margin: 0;
+    margin: 0;
+  }
 }
 
+/* ================================
+   EXTRA SMALL DEVICES
+================================ */
+
+@media (max-width: 360px) {
+
+  .sidebar-container {
+    width: 270px !important;
+
+    max-width: 85vw !important;
+  }
+
+  .dashboard-content {
+    padding: 15px 10px;
+  }
+
+  .header-title h1 {
+    font-size: 15px;
+  }
+
+  .quick-actions button {
+    min-height: 75px;
+
+    font-size: 9px;
+  }
+
+  .quick-actions button span {
+    font-size: 18px;
+  }
 }
