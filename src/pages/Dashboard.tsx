@@ -11,6 +11,7 @@ import Pagos from "./Pagos";
 import Servicios from "./Servicios";
 import MinutaDiaria from "./MinutaDiaria";
 import ServiciosPorCliente from "./ServiciosPorCliente";
+import Configuracion from "./Configuracion";
 
 interface Cliente {
   id: string;
@@ -282,50 +283,7 @@ function Dashboard() {
         return <Pagos />;
 
       case "configuracion":
-        return (
-          <div className="page-content">
-            <div className="page-header">
-              <div>
-                <h2>
-                  Configuración
-                </h2>
-
-                <p>
-                  Configuración de
-                  Aim High Cleaners.
-                </p>
-              </div>
-            </div>
-
-            <div className="content-panel">
-              <div
-                style={{
-                  padding: "30px",
-                }}
-              >
-                <h3>
-                  Configuración
-                  próximamente
-                </h3>
-
-                <p
-                  style={{
-                    marginTop:
-                      "8px",
-                    color:
-                      "#6b7280",
-                  }}
-                >
-                  Aquí configuraremos
-                  los datos de la
-                  empresa, logo,
-                  información de pago
-                  y demás opciones.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <Configuracion />;
 
       default:
         return (

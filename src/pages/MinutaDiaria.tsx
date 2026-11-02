@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "../services/supabase";
+import { obtenerSiguienteNumeroFactura } from "../services/numeracionFacturas";
 import "./MinutaDiaria.css";
 
 interface Cliente { id: string; nombre: string; }
@@ -121,10 +122,16 @@ export default function MinutaDiaria() {
     if (!window.confirm(`Se generará una factura por ${dinero(elegidos.reduce((s,r)=>s+Number(r.precio),0))}. ¿Continuar?`)) return;
     setGuardando(true); setMensaje("");
     const cliente = clientesUnicos[0];
-    const { data: ultimo, error: errorUltimo } = await supabase.from("facturas").select("numero").order("numero", { ascending: false }).limit(1).maybeSingle();
-    if (errorUltimo) { setGuardando(false); setMensaje(`No se pudo consultar numeración: ${errorUltimo.message}`); return; }
+    let siguienteNumero: number;
+    try {
+      siguienteNumero = await obtenerSiguienteNumeroFactura();
+    } catch (error) {
+      setGuardando(false);
+      setMensaje(error instanceof Error ? error.message : "No se pudo consultar numeración.");
+      return;
+    }
     const subtotal = elegidos.reduce((s,r)=>s+Number(r.precio),0);
-    const { data: factura, error: errorFactura } = await supabase.from("facturas").insert({ numero: Number(ultimo?.numero ?? 0) + 1, cliente_id: cliente, fecha: fechaLocal(), subtotal, impuesto: 0, descuento: 0, total: subtotal, estado: "PENDIENTE", observaciones: `Generada desde minuta diaria (${elegidos.length} servicios).` }).select("id").single();
+    const { data: factura, error: errorFactura } = await supabase.from("facturas").insert({ numero: siguienteNumero, cliente_id: cliente, fecha: fechaLocal(), subtotal, impuesto: 0, descuento: 0, total: subtotal, estado: "PENDIENTE", observaciones: `Generada desde minuta diaria (${elegidos.length} servicios).` }).select("id").single();
     if (errorFactura || !factura) { setGuardando(false); setMensaje(`No se pudo crear la factura: ${errorFactura?.message ?? "Error desconocido"}`); return; }
     const detalles = elegidos.map(r => ({ factura_id: factura.id, servicio_id: null, descripcion: `Apto ${r.apartamento}: ${r.descripcion}`, cantidad: 1, precio_unitario: Number(r.precio), impuesto: 0, subtotal: Number(r.precio), total: Number(r.precio) }));
     const { error: errorDetalles } = await supabase.from("factura_detalle").insert(detalles);

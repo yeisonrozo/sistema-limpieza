@@ -44,6 +44,11 @@ function Sidebar({
       label: "Pagos",
       icon: "💵",
     },
+    {
+      id: "configuracion",
+      label: "Configuración",
+      icon: "⚙️",
+    },
   ];
 
   return (
@@ -96,30 +101,7 @@ function Sidebar({
 
       </nav>
 
-      <div className="sidebar-footer">
 
-        <button
-          className={`menu-item ${
-            activePage === "configuracion"
-              ? "active"
-              : ""
-          }`}
-          onClick={() =>
-            setActivePage("configuracion")
-          }
-        >
-
-          <span className="menu-icon">
-            ⚙️
-          </span>
-
-          <span>
-            Configuración
-          </span>
-
-        </button>
-
-      </div>
 
     </aside>
   );

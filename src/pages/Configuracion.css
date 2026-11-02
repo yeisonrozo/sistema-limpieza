@@ -1,0 +1,16 @@
+.configuracion-page { padding: 28px 34px; max-width: 1050px; margin: 0 auto; }
+.configuracion-heading { margin-bottom: 24px; }
+.configuracion-eyebrow { color: #2563eb; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; }
+.configuracion-heading h2 { margin: 8px 0; color: #111827; font-size: 28px; }
+.configuracion-heading p, .configuracion-help { color: #64748b; margin: 0; }
+.configuracion-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 26px; max-width: 620px; box-shadow: 0 2px 8px #0f172a0a; }
+.configuracion-card h3 { margin: 0 0 8px; color: #111827; font-size: 19px; }
+.configuracion-card label { display: block; margin: 22px 0 8px; color: #334155; font-weight: 700; font-size: 14px; }
+.configuracion-card input { width: 100%; max-width: 260px; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 17px; }
+.configuracion-preview { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 18px 0; padding: 16px; background: #f1f5f9; border-radius: 10px; color: #475569; }
+.configuracion-preview strong { color: #1d4ed8; font-size: 25px; }
+.configuracion-card button { border: 0; border-radius: 8px; padding: 12px 18px; color: #fff; background: #2563eb; font-weight: 700; cursor: pointer; }
+.configuracion-card button:disabled { opacity: .6; cursor: not-allowed; }
+.configuracion-message { margin: 14px 0 0; color: #166534; font-weight: 600; }
+.configuracion-card small { display: block; margin-top: 18px; color: #64748b; line-height: 1.5; }
+@media (max-width: 640px) { .configuracion-page { padding: 20px 14px; } .configuracion-card { padding: 18px; } }

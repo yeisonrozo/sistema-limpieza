@@ -63,3 +63,22 @@ DROP POLICY IF EXISTS "Usuarios autenticados gestionan minuta"
 CREATE POLICY "Usuarios autenticados gestionan minuta"
   ON public.minuta_diaria FOR ALL TO authenticated
   USING (true) WITH CHECK (true);
+
+
+-- Configuración del consecutivo inicial de facturación.
+CREATE TABLE IF NOT EXISTS public.configuracion_facturacion (
+  id SMALLINT PRIMARY KEY CHECK (id = 1),
+  consecutivo_inicial BIGINT NOT NULL DEFAULT 1 CHECK (consecutivo_inicial >= 1),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO public.configuracion_facturacion (id, consecutivo_inicial)
+VALUES (1, 1)
+ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE public.configuracion_facturacion ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Usuarios autenticados gestionan numeracion"
+  ON public.configuracion_facturacion;
+CREATE POLICY "Usuarios autenticados gestionan numeracion"
+ON public.configuracion_facturacion FOR ALL TO authenticated
+USING (true) WITH CHECK (true);

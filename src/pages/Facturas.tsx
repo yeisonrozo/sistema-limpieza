@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
 import "./Facturas.css";
 import FacturaView from "./FacturaView";
+import { obtenerSiguienteNumeroFactura } from "../services/numeracionFacturas";
 
 interface Cliente {
   id: string;
@@ -842,34 +843,14 @@ function Facturas() {
          * ======================================
          */
 
-        const {
-          data: ultimaFactura,
-          error: errorUltima,
-        } = await supabase
-          .from("facturas")
-          .select("numero")
-          .order("numero", {
-            ascending: false,
-          })
-          .limit(1)
-          .maybeSingle();
-
-        if (errorUltima) {
-          console.error(
-            "Error obteniendo número:",
-            errorUltima
-          );
-
-          alert(
-            "No fue posible obtener el número de factura."
-          );
-
+        let siguienteNumero: number;
+        try {
+          siguienteNumero = await obtenerSiguienteNumeroFactura();
+        } catch (error) {
+          console.error("Error obteniendo número:", error);
+          alert(error instanceof Error ? error.message : "No fue posible obtener el número de factura.");
           return;
         }
-
-        const siguienteNumero =
-          (ultimaFactura?.numero ??
-            0) + 1;
 
         const {
           data: factura,
