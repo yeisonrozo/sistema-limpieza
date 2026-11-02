@@ -25,6 +25,16 @@ function Sidebar({
       icon: "🧹",
     },
     {
+      id: "servicios-cliente",
+      label: "Servicios por cliente",
+      icon: "📋",
+    },
+    {
+      id: "minuta",
+      label: "Minuta diaria",
+      icon: "📝",
+    },
+    {
       id: "facturas",
       label: "Facturas",
       icon: "🧾",

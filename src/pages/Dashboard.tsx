@@ -9,6 +9,8 @@ import Clientes from "./Clientes";
 import Facturas from "./Facturas";
 import Pagos from "./Pagos";
 import Servicios from "./Servicios";
+import MinutaDiaria from "./MinutaDiaria";
+import ServiciosPorCliente from "./ServiciosPorCliente";
 
 interface Cliente {
   id: string;
@@ -266,6 +268,12 @@ function Dashboard() {
 
       case "servicios":
         return <Servicios />;
+
+      case "minuta":
+        return <MinutaDiaria />;
+
+      case "servicios-cliente":
+        return <ServiciosPorCliente />;
 
       case "facturas":
         return <Facturas />;
