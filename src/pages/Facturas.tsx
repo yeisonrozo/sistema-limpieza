@@ -1200,9 +1200,8 @@ function Facturas() {
    */
 
   const prepararCorreo = (factura: Factura) => {
-    // Se navega directamente a Gmail desde el clic del usuario.
-    // Esto evita bloqueos de ventanas emergentes del navegador.
     const cliente = clienteFactura;
+
     if (!cliente) {
       alert("No se pudo cargar la información del cliente. Cierra la factura y vuelve a abrirla.");
       return;
@@ -1220,24 +1219,34 @@ Thank you so much for your business!
 Best regards,
 Aim High Cleaners LLC`;
 
+    const destinatario = cliente.email || "";
+
+    if (!destinatario) {
+      alert("Este cliente no tiene correo registrado. Agrégalo en el módulo Clientes.");
+      return;
+    }
+
+    const esMovil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (esMovil) {
+      // En celulares usa el gestor de correo configurado en el dispositivo.
+      // El protocolo mailto permite precargar destinatario, asunto y mensaje.
+      const mailtoUrl = `mailto:${encodeURIComponent(destinatario)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+      window.location.href = mailtoUrl;
+      return;
+    }
+
+    // En computador conserva la apertura de Gmail que ya funcionaba.
     const params = new URLSearchParams({
       view: "cm",
       fs: "1",
-      to: cliente.email || "",
+      to: destinatario,
       su: asunto,
       body: cuerpo,
     });
 
-    if (!cliente.email) {
-      alert("Este cliente no tiene correo registrado. Gmail se abrirá sin destinatario; puedes escribirlo manualmente.");
-    }
-
     const gmailUrl = `https://mail.google.com/mail/?${params.toString()}`;
-    const gmailTab = window.open(gmailUrl, "_blank");
-    if (!gmailTab) {
-      // Si el navegador bloquea la pestaña, continuar en la misma pestaña.
-      window.location.assign(gmailUrl);
-    }
+    window.location.href = gmailUrl;
   };
 
   const cerrarFactura = () => {
