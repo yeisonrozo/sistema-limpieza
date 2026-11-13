@@ -1,0 +1,17 @@
+ACTUALIZACION - CORREO DE FACTURAS
+
+Cambios incluidos:
+- El mensaje del correo ahora utiliza saltos de línea reales.
+- El botón Abrir Gmail navega a Gmail en la misma pestaña para evitar bloqueos de ventanas emergentes.
+- Al cerrar la vista de factura también se limpia el estado del correo preparado.
+- Se conserva el resto del proyecto y sus módulos.
+
+Para probar:
+1. Descomprime el proyecto.
+2. Abre la carpeta sistema-limpieza en Visual Studio Code.
+3. Ejecuta: npm install
+4. Configura las variables de entorno del archivo .env (no compartas ni subas las claves).
+5. Ejecuta: npm run dev
+6. Abre una factura, pulsa Preparar correo y luego Abrir Gmail.
+
+El PDF se adjunta manualmente desde Gmail.

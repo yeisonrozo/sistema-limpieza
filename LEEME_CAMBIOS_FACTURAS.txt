@@ -1,0 +1,37 @@
+AIM HIGH CLEANERS LLC - CAMBIOS EN FACTURAS
+
+NOVEDADES
+1. Cada detalle de factura tiene el campo Unit (apartamento).
+2. Puedes agregar líneas de tipo Extra con descripción libre, Unit y precio.
+3. Los extras se suman al subtotal/total y aparecen en la vista imprimible de factura.
+4. En la vista de factura, "Preparar correo" muestra destinatario, asunto y cuerpo en inglés.
+5. "Copiar todo" copia el texto para pegarlo en Gmail. "Abrir Gmail" abre Gmail en otra pestaña.
+6. El PDF debe descargarse/imprimirse y adjuntarse manualmente en Gmail.
+
+IMPORTANTE: Gmail no crea automáticamente un borrador ni adjunta el PDF con esta modalidad sin API.
+El usuario debe pegar el contenido en un mensaje nuevo y adjuntar el PDF.
+
+ACTUALIZAR SUPABASE
+1. Abre Supabase > SQL Editor > New query.
+2. Ejecuta el contenido de supabase/factura_extras_unit.sql.
+3. Esto agrega factura_detalle.unit y factura_detalle.es_extra sin borrar registros existentes.
+
+INSTALACIÓN LOCAL
+1. Conserva tu archivo .env actual y colócalo en la raíz del proyecto.
+2. En PowerShell, desde la carpeta del proyecto:
+   npm install
+   npm run dev
+3. Antes de publicar:
+   npm run build
+   git add .
+   git commit -m "Agregar extras y preparación de correo"
+   git push origin main
+
+SEGURIDAD
+El ZIP no incluye .env ni credenciales. No subas .env a GitHub.
+
+
+PRESENTACION DE EXTRAS
+Los extras aparecen como renglones normales en la factura: la descripción escrita
+por el usuario en la columna Description y el apartamento en la columna Unit.
+No se agrega la palabra "(Extra)" automáticamente.

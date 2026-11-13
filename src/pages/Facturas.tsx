@@ -43,6 +43,8 @@ interface Detalle {
   impuesto: number;
   subtotal: number;
   total: number;
+  unit: string;
+  es_extra: boolean;
 }
 
 interface DetalleFactura {
@@ -50,6 +52,8 @@ interface DetalleFactura {
   cantidad: number;
   precio_unitario: number;
   total: number;
+  unit?: string | null;
+  es_extra?: boolean | null;
 }
 
 function Facturas() {
@@ -92,6 +96,8 @@ function Facturas() {
 
   const [clienteFactura, setClienteFactura] =
     useState<Cliente | null>(null);
+
+  const [correoPreparado, setCorreoPreparado] = useState<{ destinatario: string; asunto: string; cuerpo: string } | null>(null);
 
   /*
    * ==========================================
@@ -260,8 +266,33 @@ function Facturas() {
         impuesto: 0,
         subtotal: 0,
         total: 0,
+        unit: "",
+        es_extra: false,
       },
     ]);
+  };
+
+  const agregarExtra = () => {
+    setDetalles((actuales) => [...actuales, {
+      servicio_id: "",
+      descripcion: "",
+      cantidad: 1,
+      precio_unitario: 0,
+      impuesto: 0,
+      subtotal: 0,
+      total: 0,
+      unit: "",
+      es_extra: true,
+    }]);
+  };
+
+  const actualizarExtra = (index: number, campo: "descripcion" | "unit" | "precio_unitario", valor: string) => {
+    setDetalles((actuales) => actuales.map((detalle, i) => {
+      if (i !== index) return detalle;
+      const actualizado = { ...detalle, [campo]: campo === "precio_unitario" ? Math.max(0, Number(valor) || 0) : valor };
+      const subtotal = actualizado.cantidad * actualizado.precio_unitario;
+      return { ...actualizado, subtotal, impuesto: 0, total: subtotal };
+    }));
   };
 
   /*
@@ -312,6 +343,7 @@ function Facturas() {
 
       descripcion:
         servicio.nombre,
+      es_extra: false,
 
       precio_unitario:
         precio,
@@ -499,7 +531,7 @@ function Facturas() {
     } = await supabase
       .from("factura_detalle")
       .select(
-        "id, servicio_id, descripcion, cantidad, precio_unitario, impuesto, subtotal, total"
+        "id, servicio_id, descripcion, cantidad, precio_unitario, impuesto, subtotal, total, unit, es_extra"
       )
       .eq(
         "factura_id",
@@ -581,6 +613,8 @@ function Facturas() {
             Number(
               detalle.total
             ),
+          unit: detalle.unit || "",
+          es_extra: Boolean(detalle.es_extra),
         })
       )
     );
@@ -618,7 +652,8 @@ function Facturas() {
     const detallesInvalidos =
       detalles.some(
         (detalle) =>
-          !detalle.servicio_id ||
+          (!detalle.es_extra && !detalle.servicio_id) ||
+          !detalle.descripcion.trim() ||
           detalle.cantidad <= 0 ||
           detalle.precio_unitario < 0
       );
@@ -788,7 +823,9 @@ function Facturas() {
                 facturaEditandoId,
 
               servicio_id:
-                detalle.servicio_id,
+                detalle.servicio_id || null,
+              unit: detalle.unit || null,
+              es_extra: detalle.es_extra,
 
               descripcion:
                 detalle.descripcion,
@@ -911,7 +948,9 @@ function Facturas() {
                 factura.id,
 
               servicio_id:
-                detalle.servicio_id,
+                detalle.servicio_id || null,
+              unit: detalle.unit || null,
+              es_extra: detalle.es_extra,
 
               descripcion:
                 detalle.descripcion,
@@ -1120,7 +1159,7 @@ function Facturas() {
     } = await supabase
       .from("factura_detalle")
       .select(
-        "descripcion, cantidad, precio_unitario, total"
+        "descripcion, cantidad, precio_unitario, total, unit, es_extra"
       )
       .eq(
         "factura_id",
@@ -1160,6 +1199,47 @@ function Facturas() {
    * ==========================================
    */
 
+  const prepararCorreo = (factura: Factura) => {
+    // Se navega directamente a Gmail desde el clic del usuario.
+    // Esto evita bloqueos de ventanas emergentes del navegador.
+    const cliente = clienteFactura;
+    if (!cliente) {
+      alert("No se pudo cargar la información del cliente. Cierra la factura y vuelve a abrirla.");
+      return;
+    }
+
+    const numero = String(factura.numero).padStart(4, "0");
+    const nombre = cliente.nombre || "Customer";
+    const asunto = `Aim High Cleaners Invoice ${numero} / ${nombre}`;
+    const cuerpo = `Good morning ${nombre},
+
+Attached is invoice ${numero} for the cleaning services provided.
+
+Thank you so much for your business!
+
+Best regards,
+Aim High Cleaners LLC`;
+
+    const params = new URLSearchParams({
+      view: "cm",
+      fs: "1",
+      to: cliente.email || "",
+      su: asunto,
+      body: cuerpo,
+    });
+
+    if (!cliente.email) {
+      alert("Este cliente no tiene correo registrado. Gmail se abrirá sin destinatario; puedes escribirlo manualmente.");
+    }
+
+    const gmailUrl = `https://mail.google.com/mail/?${params.toString()}`;
+    const gmailTab = window.open(gmailUrl, "_blank");
+    if (!gmailTab) {
+      // Si el navegador bloquea la pestaña, continuar en la misma pestaña.
+      window.location.assign(gmailUrl);
+    }
+  };
+
   const cerrarFactura = () => {
     setFacturaSeleccionada(
       null
@@ -1168,6 +1248,7 @@ function Facturas() {
     setClienteFactura(null);
 
     setDetalleFactura([]);
+    setCorreoPreparado(null);
   };
 
   /*
@@ -1255,35 +1336,87 @@ function Facturas() {
     clienteFactura
   ) {
     return (
-      <FacturaView
-        numero={
-          facturaSeleccionada.numero
-        }
-        fecha={
-          facturaSeleccionada.fecha
-        }
-        cliente={
-          clienteFactura
-        }
-        detalles={
-          detalleFactura
-        }
-        subtotal={
-          facturaSeleccionada.subtotal
-        }
-        impuesto={
-          facturaSeleccionada.impuesto
-        }
-        descuento={
-          facturaSeleccionada.descuento
-        }
-        total={
-          facturaSeleccionada.total
-        }
-        onClose={
-          cerrarFactura
-        }
-      />
+      <>
+        <FacturaView
+          numero={facturaSeleccionada.numero}
+          fecha={facturaSeleccionada.fecha}
+          cliente={clienteFactura}
+          detalles={detalleFactura}
+          subtotal={facturaSeleccionada.subtotal}
+          impuesto={facturaSeleccionada.impuesto}
+          descuento={facturaSeleccionada.descuento}
+          total={facturaSeleccionada.total}
+          onClose={cerrarFactura}
+          onPrepareEmail={() => prepararCorreo(facturaSeleccionada)}
+        />
+        {correoPreparado && (
+          <div className="modal-overlay" onClick={() => setCorreoPreparado(null)}>
+            <div className="invoice-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <div><h3>Correo listo para copiar</h3><p>Abre Gmail, crea un mensaje y pega los datos.</p></div>
+                <button type="button" className="modal-close" onClick={() => setCorreoPreparado(null)}>×</button>
+              </div>
+              <div className="form-group">
+                <label>Para</label>
+                <input readOnly value={correoPreparado.destinatario} placeholder="Falta registrar el correo del cliente" />
+              </div>
+              <div className="form-group">
+                <label>Asunto</label>
+                <input readOnly value={correoPreparado.asunto} />
+              </div>
+              <div className="form-group">
+                <label>Mensaje</label>
+                <textarea readOnly rows={9} value={correoPreparado.cuerpo} />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="secondary-button" onClick={async () => {
+                  const texto = `Para: ${correoPreparado.destinatario}\nAsunto: ${correoPreparado.asunto}\n\n${correoPreparado.cuerpo}`;
+                  try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                      await navigator.clipboard.writeText(texto);
+                    } else {
+                      const temporal = document.createElement("textarea");
+                      temporal.value = texto;
+                      temporal.style.position = "fixed";
+                      temporal.style.opacity = "0";
+                      document.body.appendChild(temporal);
+                      temporal.focus();
+                      temporal.select();
+                      const copiado = document.execCommand("copy");
+                      document.body.removeChild(temporal);
+                      if (!copiado) throw new Error("No se pudo copiar automáticamente.");
+                    }
+                    alert("Correo copiado. Abre Gmail, pega el contenido y adjunta el PDF.");
+                  } catch (error) {
+                    console.error("Error copiando correo:", error);
+                    alert("No se pudo copiar automáticamente. Puedes copiar el destinatario, asunto y mensaje desde los campos.");
+                  }
+                }}>Copiar todo</button>
+                <button type="button" className="primary-button" onClick={() => {
+                  const params = new URLSearchParams({
+                    view: "cm",
+                    fs: "1",
+                    to: correoPreparado.destinatario,
+                    su: correoPreparado.asunto,
+                    body: correoPreparado.cuerpo,
+                  });
+                  const gmailUrl = `https://mail.google.com/mail/?${params.toString()}`;
+                  // Abrir la pestaña de forma síncrona desde el clic para evitar bloqueadores.
+                  const gmailTab = window.open("about:blank", "_blank");
+                  if (gmailTab) {
+                    gmailTab.opener = null;
+                    gmailTab.location.href = gmailUrl;
+                  } else {
+                    window.location.assign(gmailUrl);
+                  }
+                }}>Abrir Gmail</button>
+              </div>
+              {!correoPreparado.destinatario && <p className="email-attachment-note">Este cliente no tiene correo registrado. Agrégalo en el módulo Clientes para completar el destinatario.</p>}
+              <p className="email-attachment-note">Gmail abrirá un mensaje nuevo con destinatario, asunto y texto. Descarga o imprime la factura en PDF y adjúntala manualmente.</p>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
@@ -1635,15 +1768,14 @@ function Facturas() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="add-detail-button"
-                    onClick={
-                      agregarDetalle
-                    }
-                  >
-                    + Agregar servicio
-                  </button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button type="button" className="add-detail-button" onClick={agregarDetalle}>
+                      + Agregar servicio
+                    </button>
+                    <button type="button" className="add-detail-button" onClick={agregarExtra}>
+                      + Agregar extra
+                    </button>
+                  </div>
                 </div>
 
                 {detalles.length ===
@@ -1673,55 +1805,25 @@ function Facturas() {
                           }
                         >
                           <div className="form-group service-field">
-                            <label>
-                              Servicio
-                            </label>
-
-                            <select
-                              value={
-                                detalle.servicio_id
-                              }
-                              onChange={(
-                                e
-                              ) =>
-                                cambiarServicio(
-                                  index,
-                                  e
-                                    .target
-                                    .value
-                                )
-                              }
-                              required
-                            >
-                              <option value="">
-                                Selecciona
-                              </option>
-
-                              {servicios.map(
-                                (
-                                  servicio
-                                ) => (
-                                  <option
-                                    key={
-                                      servicio.id
-                                    }
-                                    value={
-                                      servicio.id
-                                    }
-                                  >
-                                    {
-                                      servicio.nombre
-                                    }{" "}
-                                    -{" "}
-                                    {formatearDinero(
-                                      Number(
-                                        servicio.precio
-                                      )
-                                    )}
+                            <label>{detalle.es_extra ? "Descripción del extra" : "Servicio"}</label>
+                            {detalle.es_extra ? (
+                              <input value={detalle.descripcion} placeholder="Ej. Extra dirty, refrigerator cleaning"
+                                onChange={(e) => actualizarExtra(index, "descripcion", e.target.value)} required />
+                            ) : (
+                              <select value={detalle.servicio_id} onChange={(e) => cambiarServicio(index, e.target.value)} required>
+                                <option value="">Selecciona</option>
+                                {servicios.map((servicio) => (
+                                  <option key={servicio.id} value={servicio.id}>
+                                    {servicio.nombre} - {formatearDinero(Number(servicio.precio))}
                                   </option>
-                                )
-                              )}
-                            </select>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+                          <div className="form-group" style={{ width: "90px", minWidth: "90px" }}>
+                            <label>Unit</label>
+                            <input value={detalle.unit} placeholder="9C"
+                              onChange={(e) => actualizarExtra(index, "unit", e.target.value)} />
                           </div>
 
                           <div className="form-group quantity-field">
@@ -1773,17 +1875,10 @@ function Facturas() {
                               value={
                                 detalle.precio_unitario
                               }
-                              onChange={(
-                                e
-                              ) =>
-                                cambiarPrecio(
-                                  index,
-                                  Number(
-                                    e
-                                      .target
-                                      .value
-                                  )
-                                )
+                              onChange={(e) =>
+                                detalle.es_extra
+                                  ? actualizarExtra(index, "precio_unitario", e.target.value)
+                                  : cambiarPrecio(index, Number(e.target.value))
                               }
                               title="Precio personalizado para este cliente"
                             />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "../services/supabase";
 import { obtenerSiguienteNumeroFactura } from "../services/numeracionFacturas";
@@ -6,10 +6,14 @@ import "./MinutaDiaria.css";
 
 interface Cliente { id: string; nombre: string; }
 interface ServicioCliente { id: string; cliente_id: string; nombre: string; descripcion: string | null; precio: number; activo: boolean; }
+interface ExtraMinuta { descripcion: string; apartamento: string; precio: number; }
+interface ServicioAdicionalMinuta { servicio_cliente_id: string; descripcion: string; precio: number; }
 interface Registro {
   id: string; cliente_id: string; servicio_cliente_id?: string | null; fecha: string;
   apartamento: string; descripcion: string; precio: number;
   observaciones: string | null; factura_id: string | null;
+  extras?: ExtraMinuta[] | null;
+  servicios_adicionales?: ServicioAdicionalMinuta[] | null;
   clientes?: { nombre: string } | null;
 }
 const fechaLocal = () => {
@@ -45,6 +49,8 @@ export default function MinutaDiaria() {
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
   const [observaciones, setObservaciones] = useState("");
+  const [extras, setExtras] = useState<ExtraMinuta[]>([]);
+  const [serviciosAdicionales, setServiciosAdicionales] = useState<ServicioAdicionalMinuta[]>([]);
   const [mensaje, setMensaje] = useState("");
 
   const cargar = useCallback(async () => {
@@ -65,13 +71,15 @@ export default function MinutaDiaria() {
 
   const limpiar = () => {
     setEditando(null); setClienteId(""); setServicioId(""); setFecha(fechaFormato(fechaLocal()));
-    setApartamento(""); setDescripcion(""); setPrecio(""); setObservaciones("");
+    setApartamento(""); setDescripcion(""); setPrecio(""); setObservaciones(""); setExtras([]); setServiciosAdicionales([]);
   };
   const guardar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setGuardando(true); setMensaje("");
     const fechaISO = fechaDesdeFormato(fecha);
     if (!fechaISO) { setGuardando(false); setMensaje("La fecha de ingreso debe tener el formato MM/DD/YYYY y ser válida."); return; }
-    const payload = { cliente_id: clienteId, servicio_cliente_id: servicioId || null, fecha: fechaISO, apartamento: apartamento.trim(), descripcion: descripcion.trim(), precio: Number(precio), observaciones: observaciones.trim() || null };
+    const payload = { cliente_id: clienteId, servicio_cliente_id: servicioId || null, fecha: fechaISO, apartamento: apartamento.trim(), descripcion: descripcion.trim(), precio: Number(precio), observaciones: observaciones.trim() || null,
+      servicios_adicionales: serviciosAdicionales.filter(x => x.descripcion.trim()).map(x => ({ ...x, precio: Number(x.precio) || 0 })),
+      extras: extras.filter(x => x.descripcion.trim()).map(x => ({ ...x, descripcion: x.descripcion.trim(), apartamento: x.apartamento.trim(), precio: Number(x.precio) || 0 })) };
     const result = editando
       ? await supabase.from("minuta_diaria").update(payload).eq("id", editando).is("factura_id", null)
       : await supabase.from("minuta_diaria").insert(payload);
@@ -82,9 +90,24 @@ export default function MinutaDiaria() {
   const editar = (r: Registro) => {
     if (r.factura_id) return;
     setEditando(r.id); setClienteId(r.cliente_id); setServicioId(r.servicio_cliente_id ?? ""); setFecha(fechaFormato(r.fecha));
-    setApartamento(r.apartamento); setDescripcion(r.descripcion); setPrecio(String(r.precio)); setObservaciones(r.observaciones ?? "");
+    setApartamento(r.apartamento); setDescripcion(r.descripcion); setPrecio(String(r.precio)); setObservaciones(r.observaciones ?? ""); setExtras((r.extras ?? []).map(x => ({ ...x })));
+    setServiciosAdicionales((r.servicios_adicionales ?? []).map(x => ({ ...x })));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const agregarServicioAdicional = () => setServiciosAdicionales(prev => [...prev, { servicio_cliente_id: "", descripcion: "", precio: 0 }]);
+  const actualizarServicioAdicional = (index: number, servicioId: string) => {
+    const servicio = serviciosCliente.find(s => s.id === servicioId);
+    setServiciosAdicionales(prev => prev.map((x, i) => i === index ? {
+      servicio_cliente_id: servicioId,
+      descripcion: servicio?.nombre ?? "",
+      precio: servicio?.precio ?? 0,
+    } : x));
+  };
+  const eliminarServicioAdicional = (index: number) => setServiciosAdicionales(prev => prev.filter((_, i) => i !== index));
+  const agregarExtra = () => setExtras(prev => [...prev, { descripcion: "", apartamento, precio: 0 }]);
+  const actualizarExtra = (index: number, campo: keyof ExtraMinuta, valor: string) => setExtras(prev => prev.map((x, i) => i === index ? { ...x, [campo]: campo === "precio" ? Math.max(0, Number(valor) || 0) : valor } : x));
+  const eliminarExtra = (index: number) => setExtras(prev => prev.filter((_, i) => i !== index));
+
   const seleccionarCliente = (id: string) => {
     setClienteId(id);
     setServicioId("");
@@ -111,7 +134,7 @@ export default function MinutaDiaria() {
     (!filtroFecha || r.fecha === fechaDesdeFormato(filtroFecha)) && (!filtroCliente || r.cliente_id === filtroCliente) &&
     (estado === "todos" || (estado === "pendientes" ? !r.factura_id : !!r.factura_id))), [registros, filtroFecha, filtroCliente, estado]);
   const pendientesSeleccionables = filtrados.filter(r => !r.factura_id);
-  const totalPendiente = pendientesSeleccionables.reduce((s,r) => s + Number(r.precio), 0);
+  const totalPendiente = pendientesSeleccionables.reduce((s,r) => s + Number(r.precio) + (r.servicios_adicionales ?? []).reduce((a,x)=>a+Number(x.precio),0) + (r.extras ?? []).reduce((a,x) => a + Number(x.precio), 0), 0);
   const toggle = (id: string) => setSeleccionados(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev,id]);
 
   const generarFactura = async () => {
@@ -119,7 +142,8 @@ export default function MinutaDiaria() {
     if (!elegidos.length) { setMensaje("Selecciona al menos un servicio pendiente."); return; }
     const clientesUnicos = [...new Set(elegidos.map(r => r.cliente_id))];
     if (clientesUnicos.length !== 1) { setMensaje("Para generar una factura, selecciona registros de un solo cliente."); return; }
-    if (!window.confirm(`Se generará una factura por ${dinero(elegidos.reduce((s,r)=>s+Number(r.precio),0))}. ¿Continuar?`)) return;
+    const totalElegido = elegidos.reduce((s,r)=>s+Number(r.precio)+(r.servicios_adicionales ?? []).reduce((a,x)=>a+Number(x.precio),0)+(r.extras ?? []).reduce((a,x)=>a+Number(x.precio),0),0);
+    if (!window.confirm(`Se generará una factura por ${dinero(totalElegido)}. ¿Continuar?`)) return;
     setGuardando(true); setMensaje("");
     const cliente = clientesUnicos[0];
     let siguienteNumero: number;
@@ -130,10 +154,14 @@ export default function MinutaDiaria() {
       setMensaje(error instanceof Error ? error.message : "No se pudo consultar numeración.");
       return;
     }
-    const subtotal = elegidos.reduce((s,r)=>s+Number(r.precio),0);
+    const subtotal = totalElegido;
     const { data: factura, error: errorFactura } = await supabase.from("facturas").insert({ numero: siguienteNumero, cliente_id: cliente, fecha: fechaLocal(), subtotal, impuesto: 0, descuento: 0, total: subtotal, estado: "PENDIENTE", observaciones: `Generada desde minuta diaria (${elegidos.length} servicios).` }).select("id").single();
     if (errorFactura || !factura) { setGuardando(false); setMensaje(`No se pudo crear la factura: ${errorFactura?.message ?? "Error desconocido"}`); return; }
-    const detalles = elegidos.map(r => ({ factura_id: factura.id, servicio_id: null, descripcion: `Apto ${r.apartamento}: ${r.descripcion}`, cantidad: 1, precio_unitario: Number(r.precio), impuesto: 0, subtotal: Number(r.precio), total: Number(r.precio) }));
+    const detalles = elegidos.flatMap(r => [
+      { factura_id: factura.id, servicio_id: null, descripcion: r.descripcion, cantidad: 1, precio_unitario: Number(r.precio), impuesto: 0, subtotal: Number(r.precio), total: Number(r.precio), unit: r.apartamento || null, es_extra: false },
+      ...(r.servicios_adicionales ?? []).map(x => ({ factura_id: factura.id, servicio_id: null, descripcion: x.descripcion, cantidad: 1, precio_unitario: Number(x.precio), impuesto: 0, subtotal: Number(x.precio), total: Number(x.precio), unit: r.apartamento || null, es_extra: false })),
+      ...(r.extras ?? []).map(x => ({ factura_id: factura.id, servicio_id: null, descripcion: x.descripcion, cantidad: 1, precio_unitario: Number(x.precio), impuesto: 0, subtotal: Number(x.precio), total: Number(x.precio), unit: x.apartamento || r.apartamento || null, es_extra: true }))
+    ]);
     const { error: errorDetalles } = await supabase.from("factura_detalle").insert(detalles);
     if (errorDetalles) {
       await supabase.from("facturas").delete().eq("id", factura.id);
@@ -156,6 +184,26 @@ export default function MinutaDiaria() {
         <label>Precio (USD)<input type="number" min="0" step="0.01" value={precio} placeholder="Se carga al elegir servicio" readOnly required /></label>
         <label className="minuta-wide">Descripción<textarea value={descripcion} onChange={e=>setDescripcion(e.target.value)} placeholder="Se completa al seleccionar el servicio" rows={2} required /></label>
         <label className="minuta-wide">Observaciones<textarea value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Observaciones adicionales (opcional)" rows={2} /></label>
+        <div className="minuta-extras-box minuta-wide">
+          <div className="minuta-extras-heading"><strong>Otros servicios de esta minuta</strong><button type="button" className="minuta-secondary" onClick={agregarServicioAdicional} disabled={!clienteId}>+ Agregar servicio</button></div>
+          {serviciosAdicionales.map((servicio, index) => <div className="minuta-extra-form" key={`servicio-${index}`}>
+            <label>Servicio<select value={servicio.servicio_cliente_id} onChange={e=>actualizarServicioAdicional(index,e.target.value)}><option value="">Seleccionar servicio</option>{serviciosCliente.filter(s=>s.cliente_id===clienteId && (s.activo || s.id===servicio.servicio_cliente_id)).map(s=><option key={s.id} value={s.id}>{s.nombre} — {dinero(Number(s.precio))}</option>)}</select></label>
+            <label>Descripción<input value={servicio.descripcion} readOnly placeholder="Selecciona un servicio" /></label>
+            <label>Precio (USD)<input type="number" value={servicio.precio} readOnly /></label>
+            <button type="button" className="minuta-remove-extra" onClick={()=>eliminarServicioAdicional(index)}>Eliminar</button>
+          </div>)}
+          {serviciosAdicionales.length===0 && <small>Agrega aquí otros servicios para incluirlos en la misma minuta y factura.</small>}
+        </div>
+        <div className="minuta-extras-box minuta-wide">
+          <div className="minuta-extras-heading"><strong>Extras del servicio</strong><button type="button" className="minuta-secondary" onClick={agregarExtra}>+ Agregar extra</button></div>
+          {extras.map((extra, index) => <div className="minuta-extra-form" key={index}>
+            <label>Descripción del extra<input value={extra.descripcion} onChange={e=>actualizarExtra(index,"descripcion",e.target.value)} placeholder="Ej. Extra ventana" /></label>
+            <label>Unit / Apartamento<input value={extra.apartamento} onChange={e=>actualizarExtra(index,"apartamento",e.target.value)} placeholder="Ej. 328" /></label>
+            <label>Precio (USD)<input type="number" min="0" step="0.01" value={extra.precio} onChange={e=>actualizarExtra(index,"precio",e.target.value)} /></label>
+            <button type="button" className="minuta-remove-extra" onClick={()=>eliminarExtra(index)}>Eliminar</button>
+          </div>)}
+          {extras.length===0 && <small>Agrega aquí los trabajos adicionales asociados a este servicio.</small>}
+        </div>
         <div className="minuta-form-actions"><button className="minuta-primary" disabled={guardando}>{guardando ? "Guardando..." : editando ? "Guardar cambios" : "Agregar a la minuta"}</button>{editando && <button type="button" className="minuta-secondary" onClick={limpiar}>Cancelar edición</button>}</div>
       </form>
       {mensaje && <p className="minuta-message" role="status">{mensaje}</p>}
@@ -163,7 +211,11 @@ export default function MinutaDiaria() {
     <section className="minuta-card"><div className="minuta-list-heading"><div><h3>Cuaderno de servicios</h3><p>Consulta registros y prepara facturas por cliente.</p></div><strong>{filtrados.length} registros</strong></div>
       <div className="minuta-filters"><label>Fecha (MM/DD/YYYY)<input type="text" inputMode="numeric" placeholder="MM/DD/YYYY" value={filtroFecha} onChange={e=>setFiltroFecha(e.target.value)} maxLength={10} /></label><label>Cliente<select value={filtroCliente} onChange={e=>setFiltroCliente(e.target.value)}><option value="">Todos los clientes</option>{clientes.map(c=><option key={c.id} value={c.id}>{c.nombre}</option>)}</select></label><label>Estado<select value={estado} onChange={e=>{setEstado(e.target.value);setSeleccionados([]);}}><option value="pendientes">Pendientes</option><option value="facturados">Facturados</option><option value="todos">Todos</option></select></label></div>
       <div className="minuta-selection"><div><strong>{seleccionados.length} seleccionados</strong><span> · Total pendiente: {dinero(totalPendiente)}</span></div><button className="minuta-primary" onClick={generarFactura} disabled={guardando || seleccionados.length===0}>Generar factura</button></div>
-      {cargando ? <p className="minuta-empty">Cargando minuta...</p> : filtrados.length===0 ? <p className="minuta-empty">No hay registros para estos filtros.</p> : <div className="minuta-table-wrap"><table className="minuta-table"><thead><tr><th></th><th>Fecha (MM/DD/YYYY)</th><th>Cliente</th><th>Apartamento</th><th>Descripción</th><th>Precio</th><th>Observaciones</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtrados.map(r=><tr key={r.id}><td>{!r.factura_id && <input aria-label="Seleccionar registro" type="checkbox" checked={seleccionados.includes(r.id)} onChange={()=>toggle(r.id)} />}</td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{r.apartamento}</td><td>{r.descripcion}</td><td>{dinero(Number(r.precio))}</td><td>{r.observaciones || "—"}</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? `Facturado` : "Pendiente"}</span></td><td>{!r.factura_id && <div className="minuta-actions"><button onClick={()=>editar(r)}>Editar</button><button className="danger" onClick={()=>void eliminar(r)}>Eliminar</button></div>}</td></tr>)}</tbody></table></div>}
+      {cargando ? <p className="minuta-empty">Cargando minuta...</p> : filtrados.length===0 ? <p className="minuta-empty">No hay registros para estos filtros.</p> : <div className="minuta-table-wrap"><table className="minuta-table"><thead><tr><th></th><th>Fecha (MM/DD/YYYY)</th><th>Cliente</th><th>Apartamento</th><th>Descripción</th><th>Precio</th><th>Observaciones</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtrados.map(r=><Fragment key={r.id}>
+        <tr className="minuta-main-row"><td>{!r.factura_id && <input aria-label="Seleccionar servicio y extras" type="checkbox" checked={seleccionados.includes(r.id)} onChange={()=>toggle(r.id)} />}</td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{r.apartamento}</td><td><strong>{r.descripcion}</strong></td><td>{dinero(Number(r.precio))}</td><td>{r.observaciones || "—"}</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Pendiente"}</span></td><td>{!r.factura_id && <div className="minuta-actions"><button onClick={()=>editar(r)}>Editar</button><button className="danger" onClick={()=>void eliminar(r)}>Eliminar</button></div>}</td></tr>
+        {(r.servicios_adicionales ?? []).map((x,i)=><tr key={`${r.id}-servicio-${i}`} className="minuta-extra-row"><td></td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{r.apartamento}</td><td>↳ {x.descripcion}</td><td>{dinero(Number(x.precio))}</td><td>Servicio adicional</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Incluido"}</span></td><td></td></tr>)}
+        {(r.extras ?? []).map((x,i)=><tr key={`${r.id}-extra-${i}`} className="minuta-extra-row"><td></td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{x.apartamento || r.apartamento}</td><td>↳ {x.descripcion}</td><td>{dinero(Number(x.precio))}</td><td>Extra</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Incluido"}</span></td><td></td></tr>)}
+      </Fragment>)}</tbody></table></div>}
     </section>
   </main>;
 }

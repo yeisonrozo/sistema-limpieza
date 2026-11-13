@@ -189,48 +189,59 @@
   font-size: 12px;
 }
 
-.invoice-items th {
-  background: #dce5f4;
-  color: #111827;
-  padding: 7px 5px;
-  font-size: 12px;
-  font-weight: 800;
-  text-align: center;
-}
-
-.invoice-items th:first-child {
-  width: 39%;
-  text-align: left;
-}
-
-.invoice-items th:nth-child(2) {
-  width: 11%;
-}
-
-.invoice-items th:nth-child(3) {
-  width: 15%;
-}
-
-.invoice-items th:nth-child(4) {
-  width: 17%;
-}
-
-.invoice-items th:nth-child(5) {
-  width: 18%;
-}
-
+.invoice-items th,
 .invoice-items td {
-  padding: 6px 5px;
-  border-bottom: 1px solid #eeeeee;
+  box-sizing: border-box;
+  padding: 7px 8px;
   vertical-align: middle;
 }
 
-.invoice-items td:first-child {
+.invoice-items th {
+  background: #dce5f4;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Ancho de cada columna */
+.invoice-items th:nth-child(1) { width: 39%; }
+.invoice-items th:nth-child(2) { width: 11%; }
+.invoice-items th:nth-child(3) { width: 15%; }
+.invoice-items th:nth-child(4) { width: 17%; }
+.invoice-items th:nth-child(5) { width: 18%; }
+
+/* Description */
+.invoice-items th:nth-child(1),
+.invoice-items td:nth-child(1) {
   text-align: left;
 }
 
-.invoice-items td:not(:first-child) {
+/* Unit */
+.invoice-items th:nth-child(2),
+.invoice-items td:nth-child(2) {
+  text-align: center;
+}
+
+/* Date */
+.invoice-items th:nth-child(3),
+.invoice-items td:nth-child(3) {
+  text-align: center;
+}
+
+/* Unit Price */
+.invoice-items th:nth-child(4),
+.invoice-items td:nth-child(4) {
   text-align: right;
+}
+
+/* Amount */
+.invoice-items th:nth-child(5),
+.invoice-items td:nth-child(5) {
+  text-align: right;
+}
+
+.invoice-items td {
+  border-bottom: 1px solid #eeeeee;
 }
 
 .invoice-empty-row {

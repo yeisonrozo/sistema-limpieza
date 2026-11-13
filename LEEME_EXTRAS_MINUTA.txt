@@ -1,0 +1,20 @@
+CAMBIO: EXTRAS EN MINUTA DIARIA
+
+Se conservó el formulario y el historial existentes de Minuta diaria.
+Ahora el formulario permite agregar uno o varios extras con:
+- Descripción
+- Unit (apartamento)
+- Precio
+
+Cada extra se guarda como un registro independiente en minuta_diaria, con el mismo cliente y fecha del servicio principal. Al seleccionar los registros pendientes y generar la factura, los extras se transfieren como renglones independientes a factura_detalle, usando unit y es_extra.
+
+INSTALACIÓN
+1. Haz una copia de seguridad de tu proyecto actual.
+2. Descomprime este ZIP en una carpeta nueva.
+3. Copia tu archivo .env actual a la raíz del proyecto (no viene incluido por seguridad).
+4. Ejecuta npm install y npm run dev.
+
+NOTAS
+- No se agregó una tabla nueva ni se cambió la estructura de minuta_diaria.
+- La transferencia a factura usa las columnas unit y es_extra de factura_detalle. Si aún no ejecutaste la migración existente, revisa supabase/factura_extras_unit.sql y ejecútala en Supabase.
+- Para facturar, selecciona el servicio principal y sus extras en la lista de Minuta diaria. Todos deben pertenecer al mismo cliente.

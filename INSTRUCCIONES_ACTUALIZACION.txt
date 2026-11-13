@@ -1,0 +1,23 @@
+AIM HIGH CLEANERS - ACTUALIZACION MINUTA Y GMAIL
+
+1. Conserva una copia de seguridad de tu proyecto actual.
+2. Descomprime este ZIP en una carpeta nueva.
+3. Copia tu archivo .env actual a la carpeta raiz del proyecto.
+4. En Supabase > SQL Editor ejecuta:
+   supabase/minuta_servicios_adicionales.sql
+   (No borra registros. Agrega una columna JSONB para servicios adicionales.)
+5. En PowerShell, dentro de la carpeta del proyecto:
+   npm install
+   npm run dev
+
+CAMBIOS:
+- Minuta diaria permite agregar varios servicios al mismo registro.
+- Los servicios adicionales y extras se muestran en filas separadas.
+- Una sola casilla selecciona el grupo completo.
+- Al facturar, cada servicio y extra se convierte en una linea independiente.
+- Se conserva la ventana de correo y se abre Gmail en una pestaña iniciada
+  directamente por el clic para reducir bloqueos de ventanas emergentes.
+
+IMPORTANTE:
+- Conserva tu .env; no viene incluido por seguridad.
+- Prueba primero localmente antes de publicar en Netlify.

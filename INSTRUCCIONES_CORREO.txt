@@ -1,0 +1,15 @@
+ACTUALIZACION DEL CORREO - AIM HIGH CLEANERS
+
+Esta version conserva la minuta con extras y multiples servicios, y restaura la funcion anterior de correo.
+
+1. Haz una copia de seguridad de tu carpeta actual.
+2. Descomprime este ZIP en una carpeta nueva.
+3. Copia tu archivo .env de la version actual a la carpeta nueva (no se incluye ni se reemplaza).
+4. Abre una terminal en la carpeta del proyecto y ejecuta:
+   npm install
+   npm run dev
+5. Abre una factura y pulsa el boton para preparar/enviar correo. Gmail debe abrirse con destinatario, asunto y mensaje. Adjunta el PDF manualmente.
+
+Si el navegador bloquea la ventana emergente, permite las ventanas emergentes para el sitio de la aplicacion.
+
+Se conserva la migracion SQL de servicios_adicionales y extras. No borres ni reinicies las tablas de Supabase.

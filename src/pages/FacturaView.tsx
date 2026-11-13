@@ -13,6 +13,8 @@ interface DetalleFactura {
   cantidad: number;
   precio_unitario: number;
   total: number;
+  unit?: string | null;
+  es_extra?: boolean | null;
 }
 
 interface FacturaViewProps {
@@ -25,6 +27,7 @@ interface FacturaViewProps {
   descuento: number;
   total: number;
   onClose: () => void;
+  onPrepareEmail: () => void;
 }
 
 function FacturaView({
@@ -37,6 +40,7 @@ function FacturaView({
   descuento,
   total,
   onClose,
+  onPrepareEmail,
 }: FacturaViewProps) {
   const dinero = (valor: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -77,6 +81,13 @@ function FacturaView({
           onClick={() => window.print()}
         >
           🖨️ Imprimir / PDF
+        </button>
+        <button
+          type="button"
+          className="invoice-print-button"
+          onClick={onPrepareEmail}
+        >
+          ✉️ Preparar correo
         </button>
       </div>
 
@@ -170,7 +181,7 @@ function FacturaView({
                   </td>
 
                   <td>
-                    {detalle.cantidad}
+                    {detalle.unit || ""}
                   </td>
 
                   <td>
