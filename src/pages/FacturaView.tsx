@@ -15,6 +15,7 @@ interface DetalleFactura {
   total: number;
   unit?: string | null;
   es_extra?: boolean | null;
+  fecha_servicio?: string | null;
 }
 
 interface FacturaViewProps {
@@ -26,6 +27,7 @@ interface FacturaViewProps {
   impuesto: number;
   descuento: number;
   total: number;
+  observaciones?: string | null;
   onClose: () => void;
   onPrepareEmail: () => void;
 }
@@ -39,6 +41,7 @@ function FacturaView({
   impuesto,
   descuento,
   total,
+  observaciones,
   onClose,
   onPrepareEmail,
 }: FacturaViewProps) {
@@ -185,7 +188,7 @@ function FacturaView({
                   </td>
 
                   <td>
-                    {formatearFecha(fecha)}
+                    {formatearFecha(detalle.fecha_servicio || fecha)}
                   </td>
 
                   <td>
@@ -215,6 +218,13 @@ function FacturaView({
             )}
           </tbody>
         </table>
+
+        {observaciones && (
+          <div className="invoice-observations">
+            <strong>NOTES:</strong>
+            <p>{observaciones}</p>
+          </div>
+        )}
 
         <div className="invoice-summary">
           <div className="summary-row">

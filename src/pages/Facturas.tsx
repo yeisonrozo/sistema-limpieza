@@ -36,8 +36,10 @@ interface Factura {
 
 interface Detalle {
   id?: string;
-  servicio_id: string;
+  servicio_id: string | null;
+  servicio_cliente_id?: string;
   descripcion: string;
+  observaciones?: string;
   cantidad: number;
   precio_unitario: number;
   impuesto: number;
@@ -45,6 +47,7 @@ interface Detalle {
   total: number;
   unit: string;
   es_extra: boolean;
+  fecha_servicio?: string;
 }
 
 interface DetalleFactura {
@@ -54,12 +57,14 @@ interface DetalleFactura {
   total: number;
   unit?: string | null;
   es_extra?: boolean | null;
+  fecha_servicio?: string | null;
 }
 
 function Facturas() {
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [serviciosCliente, setServiciosCliente] = useState<{ id: string; cliente_id: string; nombre: string; descripcion: string | null; precio: number; activo: boolean }[]>([]);
 
   const [busqueda, setBusqueda] = useState("");
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -113,6 +118,7 @@ function Facturas() {
         facturasResponse,
         clientesResponse,
         serviciosResponse,
+        serviciosClienteResponse,
       ] = await Promise.all([
         supabase
           .from("facturas")
@@ -141,6 +147,10 @@ function Facturas() {
           .order("nombre", {
             ascending: true,
           }),
+        supabase
+          .from("servicios_cliente")
+          .select("id, cliente_id, nombre, descripcion, precio, activo")
+          .order("nombre", { ascending: true }),
       ]);
 
       if (!activo) return;
@@ -173,9 +183,14 @@ function Facturas() {
           serviciosResponse.error
         );
       } else {
-        setServicios(
-          serviciosResponse.data ?? []
-        );
+        setServicios(serviciosResponse.data ?? []);
+      }
+
+      if (serviciosClienteResponse.error) {
+        console.error("Error cargando servicios por cliente:", serviciosClienteResponse.error);
+        alert(`No se pudieron cargar los servicios por cliente: ${serviciosClienteResponse.error.message}`);
+      } else {
+        setServiciosCliente(serviciosClienteResponse.data ?? []);
       }
 
       setCargando(false);
@@ -259,8 +274,9 @@ function Facturas() {
     setDetalles([
       ...detalles,
       {
-        servicio_id: "",
+        servicio_id: null,
         descripcion: "",
+        observaciones: "",
         cantidad: 1,
         precio_unitario: 0,
         impuesto: 0,
@@ -268,14 +284,16 @@ function Facturas() {
         total: 0,
         unit: "",
         es_extra: false,
+        fecha_servicio: fecha,
       },
     ]);
   };
 
   const agregarExtra = () => {
     setDetalles((actuales) => [...actuales, {
-      servicio_id: "",
+      servicio_id: null,
       descripcion: "",
+      observaciones: "",
       cantidad: 1,
       precio_unitario: 0,
       impuesto: 0,
@@ -283,10 +301,15 @@ function Facturas() {
       total: 0,
       unit: "",
       es_extra: true,
+      fecha_servicio: fecha,
     }]);
   };
 
-  const actualizarExtra = (index: number, campo: "descripcion" | "unit" | "precio_unitario", valor: string) => {
+  const actualizarFechaServicio = (index: number, valor: string) => {
+    setDetalles(actuales => actuales.map((detalle, i) => i === index ? { ...detalle, fecha_servicio: valor } : detalle));
+  };
+
+  const actualizarExtra = (index: number, campo: "descripcion" | "observaciones" | "unit" | "precio_unitario", valor: string) => {
     setDetalles((actuales) => actuales.map((detalle, i) => {
       if (i !== index) return detalle;
       const actualizado = { ...detalle, [campo]: campo === "precio_unitario" ? Math.max(0, Number(valor) || 0) : valor };
@@ -301,61 +324,26 @@ function Facturas() {
    * ==========================================
    */
 
-  const cambiarServicio = (
-    index: number,
-    servicioId: string
-  ) => {
-    const servicio = servicios.find(
-      (item) => item.id === servicioId
+  const cambiarServicio = (index: number, servicioId: string) => {
+    const servicio = serviciosCliente.find(
+      (item) => item.id === servicioId && item.cliente_id === clienteId && item.activo
     );
-
     if (!servicio) return;
-
-    const nuevosDetalles = [
-      ...detalles,
-    ];
-
-    const cantidad =
-      nuevosDetalles[index].cantidad || 1;
-
-    /*
-     * Cuando seleccionamos un servicio,
-     * tomamos su precio base.
-     *
-     * Después el usuario puede
-     * modificarlo manualmente.
-     */
-
-    const precio =
-      Number(servicio.precio);
-
-    const subtotal =
-      cantidad * precio;
-
-    const impuesto =
-      subtotal *
-      (Number(servicio.impuesto) / 100);
-
+    const nuevosDetalles = [...detalles];
+    const cantidad = nuevosDetalles[index].cantidad || 1;
+    const precio = Number(servicio.precio) || 0;
+    const subtotal = cantidad * precio;
     nuevosDetalles[index] = {
       ...nuevosDetalles[index],
-
-      servicio_id: servicio.id,
-
-      descripcion:
-        servicio.nombre,
-      es_extra: false,
-
-      precio_unitario:
-        precio,
-
-      impuesto,
-
+      // servicios_cliente no es la tabla servicios relacionada por FK en factura_detalle.
+      servicio_id: null,
+      servicio_cliente_id: servicio.id,
+      descripcion: servicio.nombre,
+      precio_unitario: precio,
+      impuesto: 0,
       subtotal,
-
-      total:
-        subtotal + impuesto,
+      total: subtotal,
     };
-
     setDetalles(nuevosDetalles);
   };
 
@@ -387,9 +375,7 @@ function Facturas() {
 
     const impuestoPorcentaje =
       servicios.find(
-        (servicio) =>
-          servicio.id ===
-          detalle.servicio_id
+        (servicio) => servicio.id === detalle.servicio_id
       )?.impuesto ?? 0;
 
     const impuesto =
@@ -440,9 +426,7 @@ function Facturas() {
 
     const impuestoPorcentaje =
       servicios.find(
-        (servicio) =>
-          servicio.id ===
-          detalle.servicio_id
+        (servicio) => servicio.id === detalle.servicio_id
       )?.impuesto ?? 0;
 
     const impuesto =
@@ -531,7 +515,7 @@ function Facturas() {
     } = await supabase
       .from("factura_detalle")
       .select(
-        "id, servicio_id, descripcion, cantidad, precio_unitario, impuesto, subtotal, total, unit, es_extra"
+        "id, servicio_id, descripcion, cantidad, precio_unitario, impuesto, subtotal, total, unit, es_extra, fecha_servicio"
       )
       .eq(
         "factura_id",
@@ -588,6 +572,7 @@ function Facturas() {
 
           descripcion:
             detalle.descripcion,
+          observaciones: "",
 
           cantidad:
             Number(
@@ -615,6 +600,7 @@ function Facturas() {
             ),
           unit: detalle.unit || "",
           es_extra: Boolean(detalle.es_extra),
+          fecha_servicio: detalle.fecha_servicio || fecha,
         })
       )
     );
@@ -652,7 +638,6 @@ function Facturas() {
     const detallesInvalidos =
       detalles.some(
         (detalle) =>
-          (!detalle.es_extra && !detalle.servicio_id) ||
           !detalle.descripcion.trim() ||
           detalle.cantidad <= 0 ||
           detalle.precio_unitario < 0
@@ -826,9 +811,11 @@ function Facturas() {
                 detalle.servicio_id || null,
               unit: detalle.unit || null,
               es_extra: detalle.es_extra,
+              fecha_servicio: detalle.fecha_servicio || fecha,
 
-              descripcion:
-                detalle.descripcion,
+              descripcion: detalle.observaciones?.trim()
+                ? `${detalle.descripcion.trim()}\n${detalle.observaciones.trim()}`
+                : detalle.descripcion.trim(),
 
               cantidad:
                 detalle.cantidad,
@@ -951,9 +938,11 @@ function Facturas() {
                 detalle.servicio_id || null,
               unit: detalle.unit || null,
               es_extra: detalle.es_extra,
+              fecha_servicio: detalle.fecha_servicio || fecha,
 
-              descripcion:
-                detalle.descripcion,
+              descripcion: detalle.observaciones?.trim()
+                ? `${detalle.descripcion.trim()}\n${detalle.observaciones.trim()}`
+                : detalle.descripcion.trim(),
 
               cantidad:
                 detalle.cantidad,
@@ -1159,7 +1148,7 @@ function Facturas() {
     } = await supabase
       .from("factura_detalle")
       .select(
-        "descripcion, cantidad, precio_unitario, total, unit, es_extra"
+        "descripcion, cantidad, precio_unitario, total, unit, es_extra, fecha_servicio"
       )
       .eq(
         "factura_id",
@@ -1355,6 +1344,7 @@ Aim High Cleaners LLC`;
           impuesto={facturaSeleccionada.impuesto}
           descuento={facturaSeleccionada.descuento}
           total={facturaSeleccionada.total}
+          observaciones={facturaSeleccionada.observaciones}
           onClose={cerrarFactura}
           onPrepareEmail={() => prepararCorreo(facturaSeleccionada)}
         />
@@ -1710,12 +1700,27 @@ Aim High Cleaners LLC`;
                     value={
                       clienteId
                     }
-                    onChange={(e) =>
-                      setClienteId(
-                        e.target
-                          .value
-                      )
-                    }
+                    onChange={(e) => {
+                      const nuevoClienteId = e.target.value;
+                      setClienteId(nuevoClienteId);
+                      const serviciosDelCliente = serviciosCliente.filter(
+                        (servicio) => servicio.cliente_id === nuevoClienteId && servicio.activo
+                      );
+                      setDetalles(serviciosDelCliente.map((servicio) => ({
+                        servicio_id: null,
+                        servicio_cliente_id: servicio.id,
+                        descripcion: servicio.nombre,
+                        observaciones: "",
+                        cantidad: 1,
+                        precio_unitario: Number(servicio.precio) || 0,
+                        impuesto: 0,
+                        subtotal: Number(servicio.precio) || 0,
+                        total: Number(servicio.precio) || 0,
+                        unit: "",
+                        es_extra: false,
+                        fecha_servicio: fecha,
+                      })));
+                    }}
                     required
                   >
                     <option value="">
@@ -1763,6 +1768,11 @@ Aim High Cleaners LLC`;
               </div>
 
               <div className="invoice-details-section">
+                {clienteId && !serviciosCliente.some((servicio) => servicio.cliente_id === clienteId && servicio.activo) && (
+                  <p style={{ color: "#b45309", marginBottom: 12 }}>
+                    Este cliente no tiene servicios activos asignados. Configúralos en “Servicios por cliente”.
+                  </p>
+                )}
                 <div className="invoice-section-header">
                   <div>
                     <h4>
@@ -1819,9 +1829,9 @@ Aim High Cleaners LLC`;
                               <input value={detalle.descripcion} placeholder="Ej. Extra dirty, refrigerator cleaning"
                                 onChange={(e) => actualizarExtra(index, "descripcion", e.target.value)} required />
                             ) : (
-                              <select value={detalle.servicio_id} onChange={(e) => cambiarServicio(index, e.target.value)} required>
-                                <option value="">Selecciona</option>
-                                {servicios.map((servicio) => (
+                              <select value={detalle.servicio_cliente_id || serviciosCliente.find((servicio) => servicio.cliente_id === clienteId && servicio.nombre === detalle.descripcion)?.id || ""} onChange={(e) => cambiarServicio(index, e.target.value)} required>
+                                <option value="">Selecciona un servicio del cliente</option>
+                                {serviciosCliente.filter((servicio) => servicio.cliente_id === clienteId && servicio.activo).map((servicio) => (
                                   <option key={servicio.id} value={servicio.id}>
                                     {servicio.nombre} - {formatearDinero(Number(servicio.precio))}
                                   </option>
@@ -1829,10 +1839,25 @@ Aim High Cleaners LLC`;
                               </select>
                             )}
                           </div>
+                          <div className="form-group" style={{ minWidth: "180px", flex: "1 1 180px" }}>
+                            <label>Observaciones del servicio</label>
+                            <textarea
+                              value={detalle.observaciones || ""}
+                              onChange={(e) => actualizarExtra(index, "observaciones", e.target.value)}
+                              placeholder="Observaciones para este servicio o extra"
+                              rows={2}
+                            />
+                          </div>
                           <div className="form-group" style={{ width: "90px", minWidth: "90px" }}>
                             <label>Unit</label>
                             <input value={detalle.unit} placeholder="9C"
                               onChange={(e) => actualizarExtra(index, "unit", e.target.value)} />
+                          </div>
+
+                          <div className="form-group" style={{ width: "145px", minWidth: "145px" }}>
+                            <label>Fecha del servicio</label>
+                            <input type="date" value={detalle.fecha_servicio || fecha}
+                              onChange={(e) => actualizarFechaServicio(index, e.target.value)} />
                           </div>
 
                           <div className="form-group quantity-field">

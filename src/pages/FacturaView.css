@@ -598,3 +598,24 @@
     font-size: 9px;
   }
 } 
+
+/* Observaciones trasladadas desde la minuta */
+.invoice-observations {
+  margin-top: 7mm;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #374151;
+  overflow-wrap: anywhere;
+}
+
+.invoice-observations strong {
+  display: block;
+  margin-bottom: 2mm;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.invoice-observations p {
+  margin: 0;
+  white-space: pre-wrap;
+}

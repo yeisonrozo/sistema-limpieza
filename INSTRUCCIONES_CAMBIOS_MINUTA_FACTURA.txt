@@ -1,0 +1,20 @@
+CAMBIOS DE MINUTA Y FACTURA
+
+1. Reemplaza los archivos del proyecto con el contenido de este ZIP.
+2. Conserva tu archivo .env actual; no lo reemplaces.
+3. En Supabase > SQL Editor, ejecuta una sola vez:
+   supabase/factura_detalle_fecha_servicio.sql
+
+Cambios incluidos:
+- Cada extra de minuta conserva su propio apartamento/unit.
+- Cada servicio adicional de minuta tiene su propio apartamento/unit.
+- Al generar la factura, cada línea recibe su apartamento y fecha de servicio.
+- En el formulario Editar factura puedes cambiar la fecha de cada servicio.
+- Las observaciones de la minuta se copian a observaciones de la factura y se muestran en la factura.
+
+Después ejecuta:
+   npm install
+   npm run dev
+
+Para publicar:
+   npm run build

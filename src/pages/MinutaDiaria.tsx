@@ -6,8 +6,8 @@ import "./MinutaDiaria.css";
 
 interface Cliente { id: string; nombre: string; }
 interface ServicioCliente { id: string; cliente_id: string; nombre: string; descripcion: string | null; precio: number; activo: boolean; }
-interface ExtraMinuta { descripcion: string; apartamento: string; precio: number; }
-interface ServicioAdicionalMinuta { servicio_cliente_id: string; descripcion: string; precio: number; }
+interface ExtraMinuta { descripcion: string; apartamento: string; precio: number; observaciones?: string; }
+interface ServicioAdicionalMinuta { servicio_cliente_id: string; descripcion: string; apartamento: string; precio: number; observaciones?: string; }
 interface Registro {
   id: string; cliente_id: string; servicio_cliente_id?: string | null; fecha: string;
   apartamento: string; descripcion: string; precio: number;
@@ -94,12 +94,13 @@ export default function MinutaDiaria() {
     setServiciosAdicionales((r.servicios_adicionales ?? []).map(x => ({ ...x })));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const agregarServicioAdicional = () => setServiciosAdicionales(prev => [...prev, { servicio_cliente_id: "", descripcion: "", precio: 0 }]);
+  const agregarServicioAdicional = () => setServiciosAdicionales(prev => [...prev, { servicio_cliente_id: "", descripcion: "", apartamento, precio: 0 }]);
   const actualizarServicioAdicional = (index: number, servicioId: string) => {
     const servicio = serviciosCliente.find(s => s.id === servicioId);
     setServiciosAdicionales(prev => prev.map((x, i) => i === index ? {
       servicio_cliente_id: servicioId,
       descripcion: servicio?.nombre ?? "",
+      apartamento: x.apartamento ?? "",
       precio: servicio?.precio ?? 0,
     } : x));
   };
@@ -155,12 +156,12 @@ export default function MinutaDiaria() {
       return;
     }
     const subtotal = totalElegido;
-    const { data: factura, error: errorFactura } = await supabase.from("facturas").insert({ numero: siguienteNumero, cliente_id: cliente, fecha: fechaLocal(), subtotal, impuesto: 0, descuento: 0, total: subtotal, estado: "PENDIENTE", observaciones: `Generada desde minuta diaria (${elegidos.length} servicios).` }).select("id").single();
+    const { data: factura, error: errorFactura } = await supabase.from("facturas").insert({ numero: siguienteNumero, cliente_id: cliente, fecha: fechaLocal(), subtotal, impuesto: 0, descuento: 0, total: subtotal, estado: "PENDIENTE", observaciones: null }).select("id").single();
     if (errorFactura || !factura) { setGuardando(false); setMensaje(`No se pudo crear la factura: ${errorFactura?.message ?? "Error desconocido"}`); return; }
     const detalles = elegidos.flatMap(r => [
-      { factura_id: factura.id, servicio_id: null, descripcion: r.descripcion, cantidad: 1, precio_unitario: Number(r.precio), impuesto: 0, subtotal: Number(r.precio), total: Number(r.precio), unit: r.apartamento || null, es_extra: false },
-      ...(r.servicios_adicionales ?? []).map(x => ({ factura_id: factura.id, servicio_id: null, descripcion: x.descripcion, cantidad: 1, precio_unitario: Number(x.precio), impuesto: 0, subtotal: Number(x.precio), total: Number(x.precio), unit: r.apartamento || null, es_extra: false })),
-      ...(r.extras ?? []).map(x => ({ factura_id: factura.id, servicio_id: null, descripcion: x.descripcion, cantidad: 1, precio_unitario: Number(x.precio), impuesto: 0, subtotal: Number(x.precio), total: Number(x.precio), unit: x.apartamento || r.apartamento || null, es_extra: true }))
+      { factura_id: factura.id, servicio_id: null, descripcion: r.observaciones?.trim() ? `${r.descripcion}\n${r.observaciones.trim()}` : r.descripcion, cantidad: 1, precio_unitario: Number(r.precio), impuesto: 0, subtotal: Number(r.precio), total: Number(r.precio), unit: r.apartamento || null, es_extra: false, fecha_servicio: r.fecha },
+      ...(r.servicios_adicionales ?? []).map(x => ({ factura_id: factura.id, servicio_id: null, descripcion: x.observaciones?.trim() ? `${x.descripcion}\n${x.observaciones.trim()}` : x.descripcion, cantidad: 1, precio_unitario: Number(x.precio), impuesto: 0, subtotal: Number(x.precio), total: Number(x.precio), unit: x.apartamento || r.apartamento || null, es_extra: false, fecha_servicio: r.fecha })),
+      ...(r.extras ?? []).map(x => ({ factura_id: factura.id, servicio_id: null, descripcion: x.observaciones?.trim() ? `${x.descripcion}\n${x.observaciones.trim()}` : x.descripcion, cantidad: 1, precio_unitario: Number(x.precio), impuesto: 0, subtotal: Number(x.precio), total: Number(x.precio), unit: x.apartamento || r.apartamento || null, es_extra: true, fecha_servicio: r.fecha }))
     ]);
     const { error: errorDetalles } = await supabase.from("factura_detalle").insert(detalles);
     if (errorDetalles) {
@@ -189,6 +190,8 @@ export default function MinutaDiaria() {
           {serviciosAdicionales.map((servicio, index) => <div className="minuta-extra-form" key={`servicio-${index}`}>
             <label>Servicio<select value={servicio.servicio_cliente_id} onChange={e=>actualizarServicioAdicional(index,e.target.value)}><option value="">Seleccionar servicio</option>{serviciosCliente.filter(s=>s.cliente_id===clienteId && (s.activo || s.id===servicio.servicio_cliente_id)).map(s=><option key={s.id} value={s.id}>{s.nombre} — {dinero(Number(s.precio))}</option>)}</select></label>
             <label>Descripción<input value={servicio.descripcion} readOnly placeholder="Selecciona un servicio" /></label>
+            <label>Apartamento / Unit<input value={servicio.apartamento ?? ""} onChange={e=>setServiciosAdicionales(prev=>prev.map((x,i)=>i===index?{...x,apartamento:e.target.value}:x))} placeholder="Ej. 205" /></label>
+            <label>Observaciones<textarea value={servicio.observaciones ?? ""} onChange={e=>setServiciosAdicionales(prev=>prev.map((x,i)=>i===index?{...x,observaciones:e.target.value}:x))} placeholder="Observaciones de este servicio" rows={2} /></label>
             <label>Precio (USD)<input type="number" value={servicio.precio} readOnly /></label>
             <button type="button" className="minuta-remove-extra" onClick={()=>eliminarServicioAdicional(index)}>Eliminar</button>
           </div>)}
@@ -200,6 +203,7 @@ export default function MinutaDiaria() {
             <label>Descripción del extra<input value={extra.descripcion} onChange={e=>actualizarExtra(index,"descripcion",e.target.value)} placeholder="Ej. Extra ventana" /></label>
             <label>Unit / Apartamento<input value={extra.apartamento} onChange={e=>actualizarExtra(index,"apartamento",e.target.value)} placeholder="Ej. 328" /></label>
             <label>Precio (USD)<input type="number" min="0" step="0.01" value={extra.precio} onChange={e=>actualizarExtra(index,"precio",e.target.value)} /></label>
+            <label>Observaciones<textarea value={extra.observaciones ?? ""} onChange={e=>actualizarExtra(index,"observaciones",e.target.value)} placeholder="Observaciones de este extra" rows={2} /></label>
             <button type="button" className="minuta-remove-extra" onClick={()=>eliminarExtra(index)}>Eliminar</button>
           </div>)}
           {extras.length===0 && <small>Agrega aquí los trabajos adicionales asociados a este servicio.</small>}
@@ -213,8 +217,8 @@ export default function MinutaDiaria() {
       <div className="minuta-selection"><div><strong>{seleccionados.length} seleccionados</strong><span> · Total pendiente: {dinero(totalPendiente)}</span></div><button className="minuta-primary" onClick={generarFactura} disabled={guardando || seleccionados.length===0}>Generar factura</button></div>
       {cargando ? <p className="minuta-empty">Cargando minuta...</p> : filtrados.length===0 ? <p className="minuta-empty">No hay registros para estos filtros.</p> : <div className="minuta-table-wrap"><table className="minuta-table"><thead><tr><th></th><th>Fecha (MM/DD/YYYY)</th><th>Cliente</th><th>Apartamento</th><th>Descripción</th><th>Precio</th><th>Observaciones</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{filtrados.map(r=><Fragment key={r.id}>
         <tr className="minuta-main-row"><td>{!r.factura_id && <input aria-label="Seleccionar servicio y extras" type="checkbox" checked={seleccionados.includes(r.id)} onChange={()=>toggle(r.id)} />}</td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{r.apartamento}</td><td><strong>{r.descripcion}</strong></td><td>{dinero(Number(r.precio))}</td><td>{r.observaciones || "—"}</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Pendiente"}</span></td><td>{!r.factura_id && <div className="minuta-actions"><button onClick={()=>editar(r)}>Editar</button><button className="danger" onClick={()=>void eliminar(r)}>Eliminar</button></div>}</td></tr>
-        {(r.servicios_adicionales ?? []).map((x,i)=><tr key={`${r.id}-servicio-${i}`} className="minuta-extra-row"><td></td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{r.apartamento}</td><td>↳ {x.descripcion}</td><td>{dinero(Number(x.precio))}</td><td>Servicio adicional</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Incluido"}</span></td><td></td></tr>)}
-        {(r.extras ?? []).map((x,i)=><tr key={`${r.id}-extra-${i}`} className="minuta-extra-row"><td></td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{x.apartamento || r.apartamento}</td><td>↳ {x.descripcion}</td><td>{dinero(Number(x.precio))}</td><td>Extra</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Incluido"}</span></td><td></td></tr>)}
+        {(r.servicios_adicionales ?? []).map((x,i)=><tr key={`${r.id}-servicio-${i}`} className="minuta-extra-row"><td></td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{x.apartamento || r.apartamento}</td><td>↳ {x.descripcion}</td><td>{dinero(Number(x.precio))}</td><td>{x.observaciones || "Servicio adicional"}</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Incluido"}</span></td><td></td></tr>)}
+        {(r.extras ?? []).map((x,i)=><tr key={`${r.id}-extra-${i}`} className="minuta-extra-row"><td></td><td>{fechaFormato(r.fecha)}</td><td>{r.clientes?.nombre ?? clientes.find(c=>c.id===r.cliente_id)?.nombre ?? "Cliente"}</td><td>{x.apartamento || r.apartamento}</td><td>↳ {x.descripcion}</td><td>{dinero(Number(x.precio))}</td><td>{x.observaciones || "Extra"}</td><td><span className={`minuta-status ${r.factura_id ? "done" : "pending"}`}>{r.factura_id ? "Facturado" : "Incluido"}</span></td><td></td></tr>)}
       </Fragment>)}</tbody></table></div>}
     </section>
   </main>;
